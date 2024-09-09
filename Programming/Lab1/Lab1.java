@@ -1,9 +1,9 @@
 import java.util.Random;
 
 public class Lab1 {
-	static short[] n = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17};
-	static double[] x = new double[16];
-	static double[][] z = new double[15][16];
+	private static short[] n = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17};
+	private static double[] x = new double[16];
+	private static double[][] z = new double[15][16];
 	
 	public static void main(String[] args) {
 		Random r = new Random();
@@ -14,17 +14,17 @@ public class Lab1 {
 		
 		for (int i = 0; i < z.length; i++) {
 			for (int j = 0; j < z[i].length; j++) {
-				z[i][j] = calculate(n[i], i, j);
+				z[i][j] = calculate(i, j);
 			}
 		}
 		
 		printMatrix(z);
 	}
 	
-	public static double calculate(int n, int i, int j) {
-		switch (n) {
+	private static double calculate(int i, int j) {
+		switch (n[i]) {
 			case 3:
-				return Math.log(Math.pow(Math.E, Math.asin(Math.sin(x[j]))));
+				return Math.log(Math.exp(Math.asin(Math.sin(x[j]))));
 			
 			case 5:
 			case 7:
@@ -40,7 +40,7 @@ public class Lab1 {
 		}
 	}
 	
-	public static void printMatrix(double[][] z) {
+	private static void printMatrix(double[][] z) {
 		for (int i = 0; i < z.length; i++) {
 			for (int j = 0; j < z[i].length; j++) {
 				System.out.printf("%.2f\t", z[i][j]);
