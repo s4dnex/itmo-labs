@@ -43,7 +43,7 @@ public class Lab1 {
 	private static void printMatrix(double[][] z) {
 		for (int i = 0; i < z.length; i++) {
 			for (int j = 0; j < z[i].length; j++) {
-				System.out.printf("%.2f\t", z[i][j]);
+				System.out.printf("%6.2f", z[i][j]);
 			}
 			System.out.println();
 		}
