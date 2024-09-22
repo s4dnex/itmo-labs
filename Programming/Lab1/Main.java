@@ -4,7 +4,7 @@ import java.util.Random;
 
 // Variant №31307
 
-public class Lab1 {
+public class Main {
 	private static short[] z = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17};
 	private static double[] x = new double[16];
 	private static double[][] z1 = new double[15][16];
