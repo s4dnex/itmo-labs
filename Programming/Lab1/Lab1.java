@@ -2,10 +2,12 @@ package Programming.Lab1;
 
 import java.util.Random;
 
+// Variant №31307
+
 public class Lab1 {
-	private static short[] n = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17};
+	private static short[] z = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17};
 	private static double[] x = new double[16];
-	private static double[][] z = new double[15][16];
+	private static double[][] z1 = new double[15][16];
 	
 	public static void main(String[] args) {
 		Random r = new Random();
@@ -14,17 +16,17 @@ public class Lab1 {
 			x[i] = r.nextDouble(-13.0, 2.0);
 		}
 		
-		for (int i = 0; i < z.length; i++) {
-			for (int j = 0; j < z[i].length; j++) {
-				z[i][j] = calculate(i, j);
+		for (int i = 0; i < z1.length; i++) {
+			for (int j = 0; j < z1[i].length; j++) {
+				z1[i][j] = calculate(i, j);
 			}
 		}
 		
-		printMatrix(z);
+		printMatrix(z1);
 	}
 	
 	private static double calculate(int i, int j) {
-		switch (n[i]) {
+		switch (z[i]) {
 			case 3:
 				return Math.log(Math.exp(Math.asin(Math.sin(x[j]))));
 			
@@ -45,7 +47,7 @@ public class Lab1 {
 	private static void printMatrix(double[][] z) {
 		for (int i = 0; i < z.length; i++) {
 			for (int j = 0; j < z[i].length; j++) {
-				System.out.printf("%6.2f", z[i][j]);
+				System.out.printf("%6.2f ", z[i][j]);
 			}
 			System.out.println();
 		}

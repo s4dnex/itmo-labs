@@ -1,5 +1,6 @@
 {
     "conventionalCommits.scopes": [
-        "inf/lab1"
+        "inf/lab1",
+        "prog/lab1"
     ]
 }
