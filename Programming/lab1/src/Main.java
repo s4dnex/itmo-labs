@@ -1,5 +1,3 @@
-package Programming.Lab1;
-
 import java.util.Random;
 
 // Variant №31307

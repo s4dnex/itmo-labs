@@ -1,5 +1,3 @@
-package Informatics.Lab1;
-
 import java.math.BigInteger;
 import java.util.Scanner;
 import java.util.regex.Pattern;
