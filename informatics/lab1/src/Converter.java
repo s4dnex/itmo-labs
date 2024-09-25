@@ -1,4 +1,7 @@
 import java.math.BigInteger;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.math.MathContext;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -6,8 +9,11 @@ public class Converter {
     final static String INVALID_NUMBER = "Invalid number";
     final static String INVALID_FROM_BASE = "Invalid base to convert from";
     final static String INVALID_TO_BASE = "Invalid base to convert to";
+
+    final static MathContext mathContext = new MathContext(50, RoundingMode.HALF_UP);
     final static String ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    final static double GOLDEN_RATIO = (1 + Math.sqrt(5)) / 2;
+    final static BigDecimal GOLDEN_RATIO = (BigDecimal.ONE.add(BigDecimal.valueOf(5).sqrt(mathContext))).divide(BigDecimal.valueOf(2));
+    
     final static Scanner scanner = new Scanner(System.in);
     static String response = "";
 
@@ -18,7 +24,7 @@ public class Converter {
         do {
             System.out.println("Numeral system converter by Nikita \"sadnex\" Ryazanov");
             System.out.println("Available modes:");
-            System.out.println("1. Tasks of variant №20");
+            System.out.println("1. Variant №20");
             System.out.println("2. Own input");
             System.out.print("Choose a mode: ");
             response = scanner.nextLine();
@@ -28,41 +34,41 @@ public class Converter {
             case "1":
                 tasks = new String[][] {
                     // Variant №20
-                    {"68981", "10", "7"},
-                    {"40403", "5", "10"},
-                    {"B9235", "15", "5"},
-                    {"58,88", "10", "2"},
-                    {"BA,12", "16", "2"},
-                    {"34,43", "8", "2"},
-                    {"0,111101", "2", "16"},
-                    {"0,100001", "2", "10"},
-                    {"52,A1", "16", "10"},
-                    {"613301", "Fact", "10"},
-                    {"229", "10", "Fib"},
-                    {"10100000", "Fib", "10"},
-                    {"100010,001001", "Berg", "10"}
-                    // tests
+                    {"68981", "10", "7"}, // 405053
+                    {"40403", "5", "10"}, // 2603
+                    {"B9235", "15", "5"}, // 122302000
+                    {"58,88", "10", "2"}, // 111010,11100
+                    {"BA,12", "16", "2"}, // 10111010,00010
+                    {"34,43", "8", "2"}, // 11100,10001
+                    {"0,111101", "2", "16"}, // 0,F4
+                    {"0,100001", "2", "10"}, // 0,51562
+                    {"52,A1", "16", "10"}, // 82,62890
+                    {"613301", "Fact", "10"}, // 4531
+                    {"229", "10", "Fib"}, // 10101010001
+                    {"10100000", "Fib", "10"}, // 47
+                    {"100010,001001", "Berg", "10"} // 13
                     
-                    ,{"310", "Fact", "10"}
-                    ,{"4120", "Fact", "10"}
-                    ,{"20", "10", "Fact"}
-                    ,{"106", "10", "Fact"}
-                    ,{"100100", "Fib", "10"}
-                    ,{"100,01", "Berg", "10"}
-                    ,{"3", "10", "Berg"}
-                    ,{"7", "10", "Berg"}
-                    ,{"16", "10", "Berg"}
-                    ,{"10000,0001", "Berg", "10"}
-                    ,{"101000,100001", "Berg", "10"}
-                    ,{"20^210", "5S", "10"}
-                    ,{"^202^10", "5S", "10"}
-                    ,{"33^200", "7S", "10"}
-                    ,{"8134", "10", "7S"}
-                    ,{"10^2^12", "5S", "10"}
-                    ,{"572", "10", "5S"}
-                    ,{"^1021^2", "5s", "10"}
-                    ,{"-572", "10", "5s"}
-                    ,{"-1205", "10", "5s"}
+                    // tests
+                    ,{"310", "Fact", "10"} // 20
+                    ,{"4120", "Fact", "10"} // 106
+                    ,{"20", "10", "Fact"} // 310
+                    ,{"106", "10", "Fact"} // 4120
+                    ,{"100100", "Fib", "10"} // 16
+                    ,{"100,01", "Berg", "10"} // 3
+                    ,{"3", "10", "Berg"} // 100,01
+                    ,{"7", "10", "Berg"} // 10000,0001
+                    ,{"16", "10", "Berg"} // 101000,100001
+                    ,{"10000,0001", "Berg", "10"} // 7
+                    ,{"101000,100001", "Berg", "10"} // 16
+                    ,{"20^210", "5S", "10"} // 1205
+                    ,{"^202^10", "5S", "10"} // -1205
+                    ,{"33^200", "7S", "10"} // 8134
+                    ,{"8134", "10", "7S"} // 33^200
+                    ,{"10^2^12", "5S", "10"} // 572
+                    ,{"572", "10", "5S"} // 10^2^12
+                    ,{"^1021^2", "5s", "10"} // -572
+                    ,{"-572", "10", "5s"} // ^1021^2
+                    ,{"-1205", "10", "5s"} // ^202^10
                     
                 };
                 break;
@@ -71,19 +77,19 @@ public class Converter {
                 do {
                     System.out.print("Enter a number to convert: ");
                     response = scanner.nextLine();
-                } while (response.isEmpty() || response.isBlank());
+                } while (response.isBlank());
                 number = response;
 
                 do {
                     System.out.print("Enter a base of the number: ");
                     response = scanner.nextLine();
-                } while (response.isEmpty() || response.isBlank());
+                } while (response.isBlank());
                 fromBase = response;
 
                 do {
                     System.out.print("Enter a base to convert to: ");
                     response = scanner.nextLine();
-                } while (response.isEmpty() || response.isBlank());
+                } while (response.isBlank());
                 toBase = response;
 
                 tasks = new String[][] { {number, fromBase, toBase} };
@@ -91,67 +97,88 @@ public class Converter {
         }
         
         System.out.println();
-        System.out.printf("%-4s %-15s %-12s %-10s %s%n", "№", "Convert", "From Base", "To Base", "Result");
+        System.out.printf("%-4s %-15s %-12s %-10s %s%n", "№", "NUMBER", "FROM BASE", "TO BASE", "RESULT");
 
         for (int i = 0; i < tasks.length; i++) {
-            number = tasks[i][0];
-            fromBase = tasks[i][1]; 
-            toBase = tasks[i][2];
-            result = convert(number, fromBase, toBase);
-            System.out.printf("%-4d %-15s %-12s %-10s %s%n", i + 1, number, fromBase.toUpperCase(), toBase.toUpperCase(), result);
+            number = tasks[i][0].toUpperCase();
+            fromBase = tasks[i][1].toUpperCase(); 
+            toBase = tasks[i][2].toUpperCase();
+            result = convert(number, fromBase, toBase).toUpperCase();
+
+            if (number.length() > 15) number = number.substring(0, 12) + "...";
+
+            System.out.printf("%-4d %-15s %-12s %-10s %s%n", i + 1, number, fromBase, toBase, result);
         }
     }
 
     public static String convert(String number, String fromBase, String toBase) {
         String result = "";
-        double decimal = 0.0;
+        BigDecimal decimal = BigDecimal.ZERO;
 
-        switch(fromBase.toUpperCase()) {
+        switch(fromBase) {
             case "FACT":
-                if (!Pattern.matches("[0-9]+", number)) {
-                    return INVALID_NUMBER; 
-                }
+                if (!Pattern.matches("[0-9]+", number))
+                    return INVALID_NUMBER;
+                
                 decimal = convertFromFact(number);
                 break;
             
             case "FIB":
-                if (!Pattern.matches("[0-1]+", number)) {
+                if (!Pattern.matches("[0-1]+", number))
                     return INVALID_NUMBER;
-                }
+                
                 decimal = convertFromFib(number);
                 break;
             
             case "BERG":
-                if (!Pattern.matches("[0-1]+([,]?[0-1]+)?", number)) {
+                if (!Pattern.matches("[0-1]+([,]?[0-1]+)?", number)) 
                     return INVALID_NUMBER;
-                }
+                
                 decimal = convertFromBerg(number);
                 break;
 
             default:
-                if (Pattern.matches("[0-9]*[13579]+[sS]{1}", fromBase)) {
-                    if (!Pattern.matches("-?[0-9^]+[0-9]+", number)) {
-                        return INVALID_NUMBER;
+                if (Pattern.matches("[0-9]*[13579]+[S]{1}", fromBase)) {
+                    int base = Integer.parseInt(fromBase.substring(0, fromBase.length() - 1));
+                    
+                    if (!(1 <= base && base <= 71)) return INVALID_FROM_BASE;
+
+                    for (int i = 0; i < number.length(); i++) {
+                        if (number.charAt(i) == '^') continue;
+
+                        if (ALPHABET.indexOf(number.charAt(i)) < 0 || (ALPHABET.indexOf(number.charAt(i)) > (base / 2))) 
+                            return INVALID_NUMBER;
                     }
-                    decimal = convertFromSymmetric(number, Integer.parseInt(fromBase.substring(0, fromBase.length() - 1)));
+                    
+                    decimal = convertFromSymmetric(number, base);
                 }
                 else if (Pattern.matches("[0-9]+", fromBase)) {
-                    if (!Pattern.matches("-?[0-9A-Z]+([,]?[0-9A-Z]+)?", number)) {
+                    int base = Integer.parseInt(fromBase);
+                    if (!(1 <= base && base <= 36)) return INVALID_FROM_BASE;
+                    
+                    if (!Pattern.matches("-?[0-9A-Z]+([,]?[0-9A-Z]+)?", number))
                         return INVALID_NUMBER;
+
+                    for (int i = 0; i < number.length(); i++) {
+                        if (number.charAt(i) == '-' || number.charAt(i) == ',') continue;
+
+                        if (ALPHABET.indexOf(number.charAt(i)) < 0 || (ALPHABET.indexOf(number.charAt(i)) >= base)) 
+                            return INVALID_NUMBER;
                     }
-                    decimal = convertFromNBase(number, Integer.parseInt(fromBase));
+
+                    decimal = convertFromNBase(number, base);
                 }
                 else return INVALID_FROM_BASE;
                 break;
         }
 
-        switch(toBase.toUpperCase()) {
+        switch(toBase) {
             case "FACT":
-                result = String.valueOf(convertToFact((long) decimal));
+                result = String.valueOf(convertToFact(decimal));
                 break;
             
             case "FIB":
-                result = String.valueOf(convertToFib((long) decimal));
+                result = String.valueOf(convertToFib(decimal));
                 break;
 
             case "BERG":
@@ -159,11 +186,17 @@ public class Converter {
                 break;
 
             default:
-                if (Pattern.matches("[0-9]*[13579]+[sS]{1}", toBase)) {
-                    result = convertToSymmetric((int) decimal, Integer.parseInt(toBase.substring(0, toBase.length() - 1)));   
+                if (Pattern.matches("[0-9]*[13579]+[S]{1}", toBase)) {
+                    int base = Integer.parseInt(toBase.substring(0, toBase.length() - 1));
+                    if (!(1 <= base && base <= 71)) return INVALID_TO_BASE;
+
+                    result = convertToSymmetric(decimal, base);
                 }
                 else if (Pattern.matches("[0-9]+", toBase)) {
-                    result = String.valueOf(convertToNBase(decimal, Integer.parseInt(toBase)));
+                    int base = Integer.parseInt(toBase);
+                    if (!(1 <= base && base <= 36)) return INVALID_TO_BASE;
+
+                    result = String.valueOf(convertToNBase(decimal, base));
                 }
                 else return INVALID_TO_BASE;
                 break;
@@ -172,9 +205,10 @@ public class Converter {
         return result.replace(".", ",");
     }
 
-    private static double convertFromNBase(String number, int fromBase) {
+    private static BigDecimal convertFromNBase(String number, int fromBase) {
         boolean isNegative = false;
-        double decimal = 0.0;
+        BigDecimal base = BigDecimal.valueOf(fromBase);
+        BigDecimal decimal = BigDecimal.ZERO;
 
         if (number.startsWith("-")) {
             isNegative = true;
@@ -182,41 +216,53 @@ public class Converter {
         }
 
         if (number.contains(",")) {
-            int integer = 0;
-            double fraction = 0.0;
+            BigDecimal integer = BigDecimal.ZERO;
+            BigDecimal fraction = BigDecimal.ZERO;
 
             for (int i = 0; i < number.indexOf(","); i++) {
-                integer += ALPHABET.indexOf(number.charAt(i)) * Math.pow(fromBase, number.indexOf(",") - 1 - i);
+                integer = integer.add(
+                    BigDecimal.valueOf(ALPHABET.indexOf(number.charAt(i)))
+                    .multiply(base.pow(number.indexOf(",") - 1 - i))
+                );
             }
             for (int i = number.indexOf(",") + 1; i < number.length(); i++) {
-                fraction += ALPHABET.indexOf(number.charAt(i)) * Math.pow(fromBase, number.indexOf(",") - i);
+                fraction = fraction.add(
+                    BigDecimal.valueOf(ALPHABET.indexOf(number.charAt(i)))
+                    .multiply(base.pow(number.indexOf(",") - i, mathContext))
+                );
             }
 
-            decimal = integer + fraction;
+            decimal = fraction.add(integer);
         }
         else {
             for (int i = 0; i < number.length(); i++) {
-                decimal += ALPHABET.indexOf(number.charAt(i)) * Math.pow(fromBase, number.length() - 1 - i);
+                decimal = decimal.add(
+                    BigDecimal.valueOf(ALPHABET.indexOf(number.charAt(i)))
+                    .multiply(base.pow(number.length() - 1 - i))
+                );
             }
         }
 
-        return decimal * (isNegative ? -1 : 1);
+        if (isNegative) decimal = decimal.negate();
+
+        return decimal;
     }
 
-    private static String convertToNBase(double decimal, int toBase) {
-        String result = decimal < 0 ? "-" : "", resultInteger = "", resultFraction = "";
-        decimal = Math.abs(decimal);
-        int integer = (int) decimal;
-        double fraction = decimal - integer;
+    private static String convertToNBase(BigDecimal decimal, int toBase) {
+        String result = decimal.compareTo(BigDecimal.ZERO) == -1 ? "-" : "", resultInteger = "", resultFraction = "";
+        decimal = decimal.abs();
+        BigDecimal base = BigDecimal.valueOf(toBase);
+        BigDecimal integer = decimal.setScale(0, RoundingMode.DOWN);
+        BigDecimal fraction = decimal.remainder(BigDecimal.ONE);
         
-        while (integer > 0) {
-            int remainder = integer % toBase;
-            integer /= toBase;
+        while (integer.compareTo(BigDecimal.ZERO) > 0) {
+            int remainder = integer.remainder(base).intValue();
+            integer = integer.divideToIntegralValue(base);
             resultInteger = ALPHABET.charAt(remainder) + resultInteger;
         }
-        while (fraction > 0 && resultFraction.length() < 5) {
-            int remainder = (int) (fraction * toBase);
-            fraction = fraction * toBase - remainder;
+        while (fraction.compareTo(BigDecimal.ZERO) > 0 && resultFraction.length() < 5) {
+            int remainder = fraction.multiply(base).intValue();
+            fraction = fraction.multiply(base).remainder(BigDecimal.ONE);
             resultFraction += ALPHABET.charAt(remainder);
         }
         
@@ -234,110 +280,135 @@ public class Converter {
         return result;
     }
 
-    private static long convertFromFact(String number) {
-        long decimal = 0;
+    private static BigDecimal convertFromFact(String number) {
+        BigDecimal decimal = BigDecimal.ZERO;
         
         for (int i = 0; i < number.length(); i++) {
-            decimal += ALPHABET.indexOf(number.charAt(i)) * getFactorial(number.length() - i);
+            decimal = decimal.add(
+                BigDecimal.valueOf(ALPHABET.indexOf(number.charAt(i)))
+                .multiply(getFactorial(number.length() - i))
+            );
         }
         
         return decimal;
     }
 
-    private static String convertToFact(long decimal) {
+    private static String convertToFact(BigDecimal decimal) {
         String result = "";
 
-        for (int i = 2; decimal > 0; i++) {
-            result = ALPHABET.charAt((int) (decimal % i)) + result;
-            decimal /= i;
+        for (int i = 2; decimal.compareTo(BigDecimal.ZERO) > 0; i++) {
+            result = ALPHABET.charAt((decimal.remainder(BigDecimal.valueOf(i)).intValue())) + result;
+            decimal = decimal.divideToIntegralValue(BigDecimal.valueOf(i));
         }
 
         return result;
     }
 
-    private static int getFactorial(int f) {
-        int result = 1;
+    private static BigDecimal getFactorial(int f) {
+        BigDecimal result = BigDecimal.ONE;
         for (int i = 1; i <= f; i++) {
-            result = result * i;
+            result = result.multiply(BigDecimal.valueOf(i));
         }
         return result;
     }
 
-    private static long convertFromFib(String number) {
-        long decimal = 0;
+    private static BigDecimal convertFromFib(String number) {
+        BigDecimal decimal = BigDecimal.ZERO;
 
         for (int i = 0; i < number.length(); i++) {
-            decimal += ALPHABET.indexOf(number.charAt(i)) * getFibonacci(number.length() - i + 1);
+            decimal = decimal.add(
+                BigDecimal.valueOf(ALPHABET.indexOf(number.charAt(i)))
+                .multiply(getFibonacci(number.length() - i + 1))
+            );
         }
         
         return decimal;
     }
 
-    private static BigInteger convertToFib(long decimal) {
-        if (decimal == 0) return BigInteger.ZERO;
+    private static BigInteger convertToFib(BigDecimal decimal) {
+        if (decimal.compareTo(BigDecimal.ZERO) == 0) return BigInteger.ZERO;
 
         BigInteger result;
         int i = 2;
 
-        while (getFibonacci(i + 1) < decimal) {
+        while (decimal.compareTo(getFibonacci(i + 1)) > 0) {
             i++;
         }
 
-        result = BigInteger.valueOf((long) Math.pow(10, i - 2)).add(convertToFib(decimal - getFibonacci(i)));
+        result = BigInteger.valueOf((long) Math.pow(10, i - 2)).add(convertToFib(decimal.subtract(getFibonacci(i))));
 
         return result;
     }
 
-    private static long getFibonacci(int n) {
+    private static BigDecimal getFibonacci(int n) {
         // Binet's formula
-        return (long) ((Math.pow(GOLDEN_RATIO, n) - Math.pow((-GOLDEN_RATIO), -n)) / Math.sqrt(5));
+        return (GOLDEN_RATIO.pow(n)
+                .subtract(GOLDEN_RATIO.negate().pow(-n, mathContext)))
+                .divide(GOLDEN_RATIO.multiply(BigDecimal.valueOf(2)).subtract(BigDecimal.ONE), mathContext)
+                .setScale(0, RoundingMode.HALF_UP);
     }
 
-    private static double convertFromBerg(String number) {
-        double decimal = 0.0;
+    private static BigDecimal convertFromBerg(String number) {
+        BigDecimal decimal = BigDecimal.ZERO;
 
         if (number.contains(",")) {
-            double integer = 0;
-            double fraction = 0.0;
+            BigDecimal integer = BigDecimal.ZERO;
+            BigDecimal fraction = BigDecimal.ZERO;
 
             for (int i = 0; i < number.indexOf(","); i++) {
-                integer += ALPHABET.indexOf(number.charAt(i)) * Math.pow(GOLDEN_RATIO, number.indexOf(",") - 1 - i);
+                integer = integer.add(
+                    BigDecimal.valueOf(ALPHABET.indexOf(number.charAt(i)))
+                    .multiply(GOLDEN_RATIO.pow(number.indexOf(",") - 1 - i))
+                );
             }
             for (int i = number.indexOf(",") + 1; i < number.length(); i++) {
-                fraction += ALPHABET.indexOf(number.charAt(i)) * Math.pow(GOLDEN_RATIO, number.indexOf(",") - i);
+                fraction = fraction.add(
+                    BigDecimal.valueOf(ALPHABET.indexOf(number.charAt(i)))
+                    .multiply(GOLDEN_RATIO.pow(number.indexOf(",") - i, mathContext))
+                );
             }
 
-            decimal = integer + fraction;
+            decimal = fraction.add(integer);
         }
         else {
             for (int i = 0; i < number.length(); i++) {
-                decimal += ALPHABET.indexOf(number.charAt(i)) * Math.pow(GOLDEN_RATIO, number.length() - 1 - i);
+                decimal = decimal.add(
+                    BigDecimal.valueOf(ALPHABET.indexOf(number.charAt(i)))
+                    .multiply(GOLDEN_RATIO.pow(number.length() - 1 - i))
+                );
             }
         }
     
-        return decimal;
+        return decimal.setScale(5, RoundingMode.HALF_UP);
     }
 
-    private static double convertToBerg(double decimal) {
-        if (Math.abs((int) (decimal * Math.pow(10, 10))) == 0) return 0.0;
+    private static BigDecimal convertToBerg(BigDecimal decimal) {
+        long precision = (long) Math.pow(10, 10);
 
-        double result = 0.0;
-        int power = (int) Math.round(Math.log(decimal) / Math.log(GOLDEN_RATIO));
+        if (decimal.multiply(BigDecimal.TEN.multiply(BigDecimal.valueOf(precision))).abs().toBigInteger().compareTo(BigInteger.ZERO) == 0) 
+            return BigDecimal.ZERO;
 
-        while ((int) ((decimal - Math.pow(GOLDEN_RATIO, power)) * Math.pow(10, 10)) < 0) {
+        BigDecimal result = BigDecimal.ZERO;
+        int power = (int) Math.round(Math.log(decimal.longValue()) / Math.log(GOLDEN_RATIO.doubleValue()));
+
+        while (decimal.subtract(GOLDEN_RATIO.pow(power, mathContext)).multiply(BigDecimal.valueOf(precision)).round(new MathContext(2, RoundingMode.DOWN))
+                .compareTo(BigDecimal.ZERO) < 0) {
             power--;
         }
-        while ((int) ((decimal - Math.pow(GOLDEN_RATIO, power + 1)) * Math.pow(10, 10)) > 0) {
+        while (decimal.subtract(GOLDEN_RATIO.pow(power + 1, mathContext)).multiply(BigDecimal.valueOf(precision)).round(new MathContext(2, RoundingMode.DOWN))
+                .compareTo(BigDecimal.ZERO) > 0) {
             power++;
         }
 
-        result = Math.pow(10, power) + convertToBerg(decimal - Math.pow(GOLDEN_RATIO, power));
+        result = BigDecimal.valueOf(Math.pow(10, power))
+                    .add(convertToBerg(decimal.subtract(GOLDEN_RATIO.pow(power, mathContext))));
 
         return result;
     }
 
-    private static int convertFromSymmetric(String number, int fromBase) {
-        int decimal = 0;
+    private static BigDecimal convertFromSymmetric(String number, int fromBase) {
+        BigDecimal decimal = BigDecimal.ZERO;
+        BigDecimal base = BigDecimal.valueOf(fromBase);
         int amountOfNegatives = 0;
         int notDigits = 0;
         boolean isNegative = false;
@@ -352,7 +423,10 @@ public class Converter {
                 isNegative = true;
             }
             else {
-                decimal += ALPHABET.indexOf(number.charAt(i)) * Math.pow(fromBase, number.length() - 1 - i - amountOfNegatives + notDigits) * ((isNegative) ? -1 : 1);
+                decimal = decimal.add(
+                    BigDecimal.valueOf((isNegative ? -1 : 1) * ALPHABET.indexOf(number.charAt(i)))
+                    .multiply(base.pow(number.length() - 1 - i - amountOfNegatives + notDigits, mathContext))
+                );
                 isNegative = false;
             }
         }        
@@ -360,22 +434,25 @@ public class Converter {
         return decimal;
     }
 
-    private static String convertToSymmetric(int decimal, int toBase) {
+    private static String convertToSymmetric(BigDecimal decimal, int toBase) {
         String result = "";
-        int remainder = 0;
-        int maxDigit = toBase / 2;
+        BigDecimal remainder = BigDecimal.ZERO;
+        BigDecimal maxDigit = BigDecimal.valueOf(toBase / 2);
+        BigDecimal base = BigDecimal.valueOf(toBase);
 
-        while (decimal != 0) {
-            remainder = decimal % toBase;
-            if (remainder < 0) remainder += toBase;
-            decimal = (int) Math.floor(Double.parseDouble(String.valueOf(decimal)) / toBase);
+        while (decimal.compareTo(BigDecimal.ZERO) != 0) {
+            remainder = decimal.remainder(base);
+            
+            if (remainder.compareTo(BigDecimal.ZERO) < 0) remainder = remainder.add(base);
+            decimal = decimal.divide(base, RoundingMode.FLOOR);
+            
 
-            if (remainder <= maxDigit) {
-                result = ALPHABET.charAt(remainder) + result;
+            if (remainder.compareTo(maxDigit) <= 0) {
+                result = ALPHABET.charAt(remainder.intValue()) + result;
             }
             else {
-                result = "^" + String.valueOf(Math.abs(remainder - toBase)) + result;
-                decimal += 1; 
+                result = "^" + remainder.subtract(base).abs() + result;
+                decimal = decimal.add(BigDecimal.ONE); 
             }
         }
 
