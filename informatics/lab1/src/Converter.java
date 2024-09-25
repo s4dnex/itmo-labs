@@ -10,11 +10,11 @@ public class Converter {
     final static String INVALID_FROM_BASE = "Invalid base to convert from";
     final static String INVALID_TO_BASE = "Invalid base to convert to";
 
-    final static MathContext mathContext = new MathContext(50, RoundingMode.HALF_UP);
+    final static MathContext MATH_CONTEXT = new MathContext(50, RoundingMode.HALF_UP);
     final static String ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    final static BigDecimal GOLDEN_RATIO = (BigDecimal.ONE.add(BigDecimal.valueOf(5).sqrt(mathContext))).divide(BigDecimal.valueOf(2));
+    final static BigDecimal GOLDEN_RATIO = (BigDecimal.ONE.add(BigDecimal.valueOf(5).sqrt(MATH_CONTEXT))).divide(BigDecimal.valueOf(2));
     
-    final static Scanner scanner = new Scanner(System.in);
+    final static Scanner SCANNER = new Scanner(System.in);
     static String response = "";
 
     public static void main(String[] args) {
@@ -27,7 +27,7 @@ public class Converter {
             System.out.println("1. Variant №20");
             System.out.println("2. Own input");
             System.out.print("Choose a mode: ");
-            response = scanner.nextLine();
+            response = SCANNER.nextLine();
         } while (!response.equals("1") && !response.equals("2"));
         
         switch (response) {
@@ -69,26 +69,31 @@ public class Converter {
                     ,{"^1021^2", "5s", "10"} // -572
                     ,{"-572", "10", "5s"} // ^1021^2
                     ,{"-1205", "10", "5s"} // ^202^10
-                    
+                    ,{"1937", "10", "-10"} // 18077
+                    ,{"18077", "-10", "10"} // 1937
+                    ,{"123", "-10", "10"} // 83
+                    ,{"58", "-10", "10"} // -42
+                    ,{"-42", "10", "-10"} // 58
+                    ,{"83", "10", "-10"} // 123
                 };
                 break;
         
             case "2":
                 do {
                     System.out.print("Enter a number to convert: ");
-                    response = scanner.nextLine();
+                    response = SCANNER.nextLine();
                 } while (response.isBlank());
                 number = response;
 
                 do {
                     System.out.print("Enter a base of the number: ");
-                    response = scanner.nextLine();
+                    response = SCANNER.nextLine();
                 } while (response.isBlank());
                 fromBase = response;
 
                 do {
                     System.out.print("Enter a base to convert to: ");
-                    response = scanner.nextLine();
+                    response = SCANNER.nextLine();
                 } while (response.isBlank());
                 toBase = response;
 
@@ -152,21 +157,23 @@ public class Converter {
                     
                     decimal = convertFromSymmetric(number, base);
                 }
-                else if (Pattern.matches("[0-9]+", fromBase)) {
+                else if (Pattern.matches("-?[0-9]+", fromBase)) {
                     int base = Integer.parseInt(fromBase);
-                    if (!(1 <= base && base <= 36)) return INVALID_FROM_BASE;
+                    if (!(1 <= Math.abs(base) && Math.abs(base) <= 36)) 
+                        return INVALID_FROM_BASE;
                     
-                    if (!Pattern.matches("-?[0-9A-Z]+([,]?[0-9A-Z]+)?", number))
+                    if (!Pattern.matches(base < 0 ? "[0-9A-Z]+" : "-?[0-9A-Z]+([,]?[0-9A-Z]+)?", number))
                         return INVALID_NUMBER;
 
                     for (int i = 0; i < number.length(); i++) {
                         if (number.charAt(i) == '-' || number.charAt(i) == ',') continue;
 
-                        if (ALPHABET.indexOf(number.charAt(i)) < 0 || (ALPHABET.indexOf(number.charAt(i)) >= base)) 
+                        if (ALPHABET.indexOf(number.charAt(i)) < 0 || (ALPHABET.indexOf(number.charAt(i)) >= Math.abs(base))) 
                             return INVALID_NUMBER;
                     }
 
-                    decimal = convertFromNBase(number, base);
+                    if (base < 0) decimal = convertFromNegaBase(number, base);
+                    else decimal = convertFromNBase(number, base);
                 }
                 else return INVALID_FROM_BASE;
                 break;
@@ -190,13 +197,21 @@ public class Converter {
                     int base = Integer.parseInt(toBase.substring(0, toBase.length() - 1));
                     if (!(1 <= base && base <= 71)) return INVALID_TO_BASE;
 
+                    if ((decimal.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) != 0)) 
+                        return INVALID_NUMBER;
+
                     result = convertToSymmetric(decimal, base);
                 }
-                else if (Pattern.matches("[0-9]+", toBase)) {
+                else if (Pattern.matches("-?[0-9]+", toBase)) {
                     int base = Integer.parseInt(toBase);
-                    if (!(1 <= base && base <= 36)) return INVALID_TO_BASE;
+                    if (!(1 <= Math.abs(base) && Math.abs(base) <= 36)) 
+                        return INVALID_FROM_BASE;
 
-                    result = String.valueOf(convertToNBase(decimal, base));
+                    if (base < 0 && (decimal.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) != 0)) 
+                        return INVALID_NUMBER;
+                    
+                    if (base < 0) result = String.valueOf(convertToNegaBase(decimal, base));
+                    else result = String.valueOf(convertToNBase(decimal, base));
                 }
                 else return INVALID_TO_BASE;
                 break;
@@ -228,7 +243,7 @@ public class Converter {
             for (int i = number.indexOf(",") + 1; i < number.length(); i++) {
                 fraction = fraction.add(
                     BigDecimal.valueOf(ALPHABET.indexOf(number.charAt(i)))
-                    .multiply(base.pow(number.indexOf(",") - i, mathContext))
+                    .multiply(base.pow(number.indexOf(",") - i, MATH_CONTEXT))
                 );
             }
 
@@ -255,30 +270,57 @@ public class Converter {
         BigDecimal integer = decimal.setScale(0, RoundingMode.DOWN);
         BigDecimal fraction = decimal.remainder(BigDecimal.ONE);
         
-        while (integer.compareTo(BigDecimal.ZERO) > 0) {
+        while (integer.compareTo(BigDecimal.ZERO) != 0) {
             int remainder = integer.remainder(base).intValue();
             integer = integer.divideToIntegralValue(base);
             resultInteger = ALPHABET.charAt(remainder) + resultInteger;
         }
-        while (fraction.compareTo(BigDecimal.ZERO) > 0 && resultFraction.length() < 5) {
+        while (fraction.compareTo(BigDecimal.ZERO) != 0 && resultFraction.length() < 5) {
             int remainder = fraction.multiply(base).intValue();
             fraction = fraction.multiply(base).remainder(BigDecimal.ONE);
             resultFraction += ALPHABET.charAt(remainder);
         }
         
-        
-        if (resultInteger.length() > 0) {
-            result += resultInteger;
-        }
-        else {
-            result += "0";
-        }
-        if (resultFraction.length() > 0) {
-            result += "," + resultFraction;
-        }
+        if (resultInteger.length() > 0) result += resultInteger;
+        else result = "0";
+        if (resultFraction.length() > 0) result += "," + resultFraction;
 
         return result;
     }
+
+    private static BigDecimal convertFromNegaBase(String number, int fromBase) {
+        BigDecimal base = BigDecimal.valueOf(fromBase);
+        BigDecimal decimal = BigDecimal.ZERO;
+
+
+        for (int i = 0; i < number.length(); i++) {
+            decimal = decimal.add(
+                BigDecimal.valueOf(ALPHABET.indexOf(number.charAt(i)))
+                .multiply(base.pow(number.length() - 1 - i))
+            );
+        }
+
+        return decimal;
+    }
+
+    private static String convertToNegaBase(BigDecimal decimal, int toBase) {
+        String result = "", resultInteger = "";
+        BigDecimal base = BigDecimal.valueOf(toBase);
+        BigDecimal integer = decimal.setScale(0, RoundingMode.DOWN);
+        
+        while (integer.compareTo(BigDecimal.ZERO) != 0) {
+            int remainder = integer.remainder(base).intValue();
+            if (remainder < 0) remainder += Math.abs(toBase);
+            integer = integer.divide(base, MATH_CONTEXT).setScale(0, RoundingMode.CEILING);
+            resultInteger = ALPHABET.charAt(remainder) + resultInteger;
+        }
+        
+        if (resultInteger.length() > 0) result += resultInteger;
+        else result = "0";
+
+        return result;
+    }
+
 
     private static BigDecimal convertFromFact(String number) {
         BigDecimal decimal = BigDecimal.ZERO;
@@ -343,8 +385,8 @@ public class Converter {
     private static BigDecimal getFibonacci(int n) {
         // Binet's formula
         return (GOLDEN_RATIO.pow(n)
-                .subtract(GOLDEN_RATIO.negate().pow(-n, mathContext)))
-                .divide(GOLDEN_RATIO.multiply(BigDecimal.valueOf(2)).subtract(BigDecimal.ONE), mathContext)
+                .subtract(GOLDEN_RATIO.negate().pow(-n, MATH_CONTEXT)))
+                .divide(GOLDEN_RATIO.multiply(BigDecimal.valueOf(2)).subtract(BigDecimal.ONE), MATH_CONTEXT)
                 .setScale(0, RoundingMode.HALF_UP);
     }
 
@@ -364,7 +406,7 @@ public class Converter {
             for (int i = number.indexOf(",") + 1; i < number.length(); i++) {
                 fraction = fraction.add(
                     BigDecimal.valueOf(ALPHABET.indexOf(number.charAt(i)))
-                    .multiply(GOLDEN_RATIO.pow(number.indexOf(",") - i, mathContext))
+                    .multiply(GOLDEN_RATIO.pow(number.indexOf(",") - i, MATH_CONTEXT))
                 );
             }
 
@@ -385,23 +427,28 @@ public class Converter {
     private static BigDecimal convertToBerg(BigDecimal decimal) {
         long precision = (long) Math.pow(10, 10);
 
-        if (decimal.multiply(BigDecimal.TEN.multiply(BigDecimal.valueOf(precision))).abs().toBigInteger().compareTo(BigInteger.ZERO) == 0) 
+        if (decimal.multiply(BigDecimal.TEN.multiply(BigDecimal.valueOf(precision)))
+                .abs().toBigInteger().compareTo(BigInteger.ZERO) == 0) 
             return BigDecimal.ZERO;
 
         BigDecimal result = BigDecimal.ZERO;
         int power = (int) Math.round(Math.log(decimal.longValue()) / Math.log(GOLDEN_RATIO.doubleValue()));
 
-        while (decimal.subtract(GOLDEN_RATIO.pow(power, mathContext)).multiply(BigDecimal.valueOf(precision)).round(new MathContext(2, RoundingMode.DOWN))
+        while (decimal.subtract(GOLDEN_RATIO.pow(power, MATH_CONTEXT))
+                .multiply(BigDecimal.valueOf(precision))
+                .setScale(0, RoundingMode.DOWN)
                 .compareTo(BigDecimal.ZERO) < 0) {
             power--;
         }
-        while (decimal.subtract(GOLDEN_RATIO.pow(power + 1, mathContext)).multiply(BigDecimal.valueOf(precision)).round(new MathContext(2, RoundingMode.DOWN))
+        while (decimal.subtract(GOLDEN_RATIO.pow(power + 1, MATH_CONTEXT))
+                .multiply(BigDecimal.valueOf(precision))
+                .setScale(0, RoundingMode.DOWN)
                 .compareTo(BigDecimal.ZERO) > 0) {
             power++;
         }
 
         result = BigDecimal.valueOf(Math.pow(10, power))
-                    .add(convertToBerg(decimal.subtract(GOLDEN_RATIO.pow(power, mathContext))));
+                    .add(convertToBerg(decimal.subtract(GOLDEN_RATIO.pow(power, MATH_CONTEXT))));
 
         return result;
     }
@@ -425,7 +472,7 @@ public class Converter {
             else {
                 decimal = decimal.add(
                     BigDecimal.valueOf((isNegative ? -1 : 1) * ALPHABET.indexOf(number.charAt(i)))
-                    .multiply(base.pow(number.length() - 1 - i - amountOfNegatives + notDigits, mathContext))
+                    .multiply(base.pow(number.length() - 1 - i - amountOfNegatives + notDigits, MATH_CONTEXT))
                 );
                 isNegative = false;
             }
