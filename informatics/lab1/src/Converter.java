@@ -6,17 +6,28 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class Converter {
-    final static String INVALID_NUMBER = "Invalid number";
-    final static String INVALID_FROM_BASE = "Invalid base to convert from";
-    final static String INVALID_TO_BASE = "Invalid base to convert to";
+    final static String INVALID_NUMBER_MSG = "Invalid number";
+    final static String INVALID_FROM_BASE_MSG = "Invalid base to convert from";
+    final static String INVALID_TO_BASE_MSG = "Invalid base to convert to";
+
+    final static String FACT_NUM_REGEX = "-?[0-9]+";
+    final static String FIB_NUM_REGEX = "-?[0-1]+";
+    final static String BERG_NUM_REGEX = "-?[0-1]+([,]?[0-1]+)?";
+    final static String NEGA_NUM_REGEX = "[0-9A-Z]+";
+    final static String N_NUM_REGEX = "-?[0-9A-Z]+([,]?[0-9A-Z]+)?";
+
+    final static String SYM_BASE_REGEX = "[0-9]*[13579]+[S]{1}";
+    final static String N_BASE_REGEX = "-?[0-9]+";
 
     final static int FRACTION_DIGITS = 5;
     final static MathContext MATH_CONTEXT = new MathContext(50, RoundingMode.HALF_UP);
     final static String ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    final static BigDecimal GOLDEN_RATIO = (BigDecimal.ONE.add(BigDecimal.valueOf(5).sqrt(MATH_CONTEXT))).divide(BigDecimal.valueOf(2));
+    final static BigDecimal GOLDEN_RATIO = (BigDecimal.ONE
+                                            .add(BigDecimal.valueOf(5).sqrt(MATH_CONTEXT)))
+                                            .divide(BigDecimal.valueOf(2));
     
-    final static Scanner SCANNER = new Scanner(System.in);
-    static String response = "";
+    private final static Scanner SCANNER = new Scanner(System.in);
+    private static String response = "";
 
     public static void main(String[] args) {
         String[][] tasks = {};
@@ -135,73 +146,73 @@ public class Converter {
 
         switch(fromBase) {
             case "FACT":
-                if (!Pattern.matches("-?[0-9]+", number))
-                    return INVALID_NUMBER;
+                if (!Pattern.matches(FACT_NUM_REGEX, number))
+                    return INVALID_NUMBER_MSG;
                 
                 decimal = convertFromFact(number);
                 break;
             
             case "FIB":
-                if (!Pattern.matches("-?[0-1]+", number))
-                    return INVALID_NUMBER;
+                if (!Pattern.matches(FIB_NUM_REGEX, number))
+                    return INVALID_NUMBER_MSG;
                 
                 decimal = convertFromFib(number);
                 break;
             
             case "BERG":
-                if (!Pattern.matches("-?[0-1]+([,]?[0-1]+)?", number)) 
-                    return INVALID_NUMBER;
+                if (!Pattern.matches(BERG_NUM_REGEX, number)) 
+                    return INVALID_NUMBER_MSG;
                 
                 decimal = convertFromBerg(number);
                 break;
 
             default:
-                if (Pattern.matches("[0-9]*[13579]+[S]{1}", fromBase)) {
+                if (Pattern.matches(SYM_BASE_REGEX, fromBase)) {
                     int base = Integer.parseInt(fromBase.substring(0, fromBase.length() - 1));
                     
-                    if (!(1 <= base && base <= 71)) return INVALID_FROM_BASE;
+                    if (!(1 <= base && base <= 71)) return INVALID_FROM_BASE_MSG;
 
                     for (int i = 0; i < number.length(); i++) {
                         if (number.charAt(i) == '^') continue;
 
                         if (ALPHABET.indexOf(number.charAt(i)) < 0 || (ALPHABET.indexOf(number.charAt(i)) > (base / 2))) 
-                            return INVALID_NUMBER;
+                            return INVALID_NUMBER_MSG;
                     }
                     
                     decimal = convertFromSymmetric(number, base);
                 }
-                else if (Pattern.matches("-?[0-9]+", fromBase)) {
+                else if (Pattern.matches(N_BASE_REGEX, fromBase)) {
                     int base = Integer.parseInt(fromBase);
                     if (!(1 <= Math.abs(base) && Math.abs(base) <= 36)) 
-                        return INVALID_FROM_BASE;
+                        return INVALID_FROM_BASE_MSG;
                     
-                    if (!Pattern.matches(base < 0 ? "[0-9A-Z]+" : "-?[0-9A-Z]+([,]?[0-9A-Z]+)?", number))
-                        return INVALID_NUMBER;
+                    if (!Pattern.matches(base < 0 ? NEGA_NUM_REGEX : N_NUM_REGEX, number))
+                        return INVALID_NUMBER_MSG;
 
                     for (int i = 0; i < number.length(); i++) {
                         if (number.charAt(i) == '-' || number.charAt(i) == ',') continue;
 
                         if (ALPHABET.indexOf(number.charAt(i)) < 0 || (ALPHABET.indexOf(number.charAt(i)) >= Math.abs(base))) 
-                            return INVALID_NUMBER;
+                            return INVALID_NUMBER_MSG;
                     }
 
                     if (base < 0) decimal = convertFromNegaBase(number, base);
                     else decimal = convertFromNBase(number, base);
                 }
-                else return INVALID_FROM_BASE;
+                else return INVALID_FROM_BASE_MSG;
                 break;
         }
 
         switch(toBase) {
             case "FACT":
                 if (decimal.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) != 0)
-                    return INVALID_NUMBER;
+                    return INVALID_NUMBER_MSG;
                 result = String.valueOf(convertToFact(decimal));
                 break;
             
             case "FIB":
                 if (decimal.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) != 0)
-                    return INVALID_NUMBER;
+                    return INVALID_NUMBER_MSG;
                 result = String.valueOf(convertToFib(decimal));
                 break;
 
@@ -210,27 +221,27 @@ public class Converter {
                 break;
 
             default:
-                if (Pattern.matches("[0-9]*[13579]+[S]{1}", toBase)) {
+                if (Pattern.matches(SYM_BASE_REGEX, toBase)) {
                     int base = Integer.parseInt(toBase.substring(0, toBase.length() - 1));
-                    if (!(1 <= base && base <= 71)) return INVALID_TO_BASE;
+                    if (!(1 <= base && base <= 71)) return INVALID_TO_BASE_MSG;
 
                     if ((decimal.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) != 0)) 
-                        return INVALID_NUMBER;
+                        return INVALID_NUMBER_MSG;
 
                     result = convertToSymmetric(decimal, base);
                 }
-                else if (Pattern.matches("-?[0-9]+", toBase)) {
+                else if (Pattern.matches(N_BASE_REGEX, toBase)) {
                     int base = Integer.parseInt(toBase);
                     if (!(1 <= Math.abs(base) && Math.abs(base) <= 36)) 
-                        return INVALID_FROM_BASE;
+                        return INVALID_FROM_BASE_MSG;
 
                     if (base < 0 && (decimal.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) != 0)) 
-                        return INVALID_NUMBER;
+                        return INVALID_NUMBER_MSG;
                     
                     if (base < 0) result = String.valueOf(convertToNegaBase(decimal, base));
                     else result = String.valueOf(convertToNBase(decimal, base));
                 }
-                else return INVALID_TO_BASE;
+                else return INVALID_TO_BASE_MSG;
                 break;
         }
 
@@ -338,7 +349,6 @@ public class Converter {
         return result;
     }
 
-
     private static BigDecimal convertFromFact(String number) {
         boolean isNegative = false;
         BigDecimal decimal = BigDecimal.ZERO;
@@ -380,9 +390,9 @@ public class Converter {
         return result;
     }
 
-    private static BigDecimal getFactorial(int f) {
+    private static BigDecimal getFactorial(int n) {
         BigDecimal result = BigDecimal.ONE;
-        for (int i = 1; i <= f; i++) {
+        for (int i = 1; i <= n; i++) {
             result = result.multiply(BigDecimal.valueOf(i));
         }
         return result;
@@ -409,11 +419,11 @@ public class Converter {
         return decimal;
     }
 
-    private static BigInteger convertToFib(BigDecimal decimal) {
-        if (decimal.compareTo(BigDecimal.ZERO) == 0) return BigInteger.ZERO;
+    private static BigDecimal convertToFib(BigDecimal decimal) {
+        if (decimal.compareTo(BigDecimal.ZERO) == 0) return BigDecimal.ZERO;
 
         boolean isNegative = false;
-        BigInteger result;
+        BigDecimal result;
         int i = 2;
 
         if (decimal.compareTo(BigDecimal.ZERO) < 0) {
@@ -425,12 +435,12 @@ public class Converter {
             i++;
         }
 
-        result = BigInteger.valueOf((long) Math.pow(10, i - 2))
+        result = BigDecimal.TEN.pow(i - 2)
                 .add(convertToFib(decimal.subtract(getFibonacci(i))));
 
         if (isNegative) result = result.negate();
 
-        return result;
+        return result.setScale(0, RoundingMode.DOWN);
     }
 
     private static BigDecimal getFibonacci(int n) {
