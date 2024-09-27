@@ -60,7 +60,7 @@ public class Converter {
                     {"10100000", "Fib", "10"}, // 47
                     {"100010,001001", "Berg", "10"} // 13
                     
-                    /* tests
+                    // tests
                     ,{"-310", "fact", "10"} // -20
                     ,{"310", "Fact", "10"} // 20
                     ,{"4120", "Fact", "10"} // 106
@@ -98,7 +98,7 @@ public class Converter {
                     ,{"58", "-10", "10"} // -42
                     ,{"-42", "10", "-10"} // 58
                     ,{"83", "10", "-10"} // 123
-                     */
+                     
                 };
                 break;
         
@@ -148,6 +148,11 @@ public class Converter {
             case "FACT":
                 if (!Pattern.matches(FACT_NUM_REGEX, number))
                     return INVALID_NUMBER_MSG;
+
+                for (int i = 0; i < number.replace("-", "").length(); i++) {
+                    if (ALPHABET.indexOf(number.replace("-", "").charAt(i)) > (number.replace("-", "").length() - i))
+                        return INVALID_NUMBER_MSG;
+                }
                 
                 decimal = convertFromFact(number);
                 break;
