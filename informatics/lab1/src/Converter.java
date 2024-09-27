@@ -10,6 +10,7 @@ public class Converter {
     final static String INVALID_FROM_BASE = "Invalid base to convert from";
     final static String INVALID_TO_BASE = "Invalid base to convert to";
 
+    final static int FRACTION_DIGITS = 5;
     final static MathContext MATH_CONTEXT = new MathContext(50, RoundingMode.HALF_UP);
     final static String ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     final static BigDecimal GOLDEN_RATIO = (BigDecimal.ONE.add(BigDecimal.valueOf(5).sqrt(MATH_CONTEXT))).divide(BigDecimal.valueOf(2));
@@ -25,8 +26,8 @@ public class Converter {
             System.out.println("Numeral system converter by Nikita \"sadnex\" Ryazanov");
             System.out.println("Available modes:");
             System.out.println("1. Variant №20");
-            System.out.println("2. Own input");
-            System.out.print("Choose a mode: ");
+            System.out.println("2. Console input");
+            System.out.print("Enter a corresponding number: ");
             response = SCANNER.nextLine();
         } while (!response.equals("1") && !response.equals("2"));
         
@@ -48,18 +49,29 @@ public class Converter {
                     {"10100000", "Fib", "10"}, // 47
                     {"100010,001001", "Berg", "10"} // 13
                     
-                    // tests
+                    /* tests
+                    ,{"-310", "fact", "10"} // -20
                     ,{"310", "Fact", "10"} // 20
                     ,{"4120", "Fact", "10"} // 106
+                    ,{"-4120", "fact", "10"} // -106
                     ,{"20", "10", "Fact"} // 310
+                    ,{"-20", "10", "fact"} // -310
                     ,{"106", "10", "Fact"} // 4120
+                    ,{"-106", "10", "fact"} // -4120
                     ,{"100100", "Fib", "10"} // 16
+                    ,{"-100100", "Fib", "10"} // -16
                     ,{"100,01", "Berg", "10"} // 3
+                    ,{"-100,01", "Berg", "10"} // -3
                     ,{"3", "10", "Berg"} // 100,01
+                    ,{"-3", "10", "Berg"} // -100,01
                     ,{"7", "10", "Berg"} // 10000,0001
+                    ,{"-7", "10", "Berg"} // -10000,0001
                     ,{"16", "10", "Berg"} // 101000,100001
+                    ,{"-16", "10", "Berg"} // -101000,100001
                     ,{"10000,0001", "Berg", "10"} // 7
+                    ,{"-10000,0001", "Berg", "10"} // -7
                     ,{"101000,100001", "Berg", "10"} // 16
+                    ,{"-101000,100001", "Berg", "10"} // -16
                     ,{"20^210", "5S", "10"} // 1205
                     ,{"^202^10", "5S", "10"} // -1205
                     ,{"33^200", "7S", "10"} // 8134
@@ -75,6 +87,7 @@ public class Converter {
                     ,{"58", "-10", "10"} // -42
                     ,{"-42", "10", "-10"} // 58
                     ,{"83", "10", "-10"} // 123
+                     */
                 };
                 break;
         
@@ -122,21 +135,21 @@ public class Converter {
 
         switch(fromBase) {
             case "FACT":
-                if (!Pattern.matches("[0-9]+", number))
+                if (!Pattern.matches("-?[0-9]+", number))
                     return INVALID_NUMBER;
                 
                 decimal = convertFromFact(number);
                 break;
             
             case "FIB":
-                if (!Pattern.matches("[0-1]+", number))
+                if (!Pattern.matches("-?[0-1]+", number))
                     return INVALID_NUMBER;
                 
                 decimal = convertFromFib(number);
                 break;
             
             case "BERG":
-                if (!Pattern.matches("[0-1]+([,]?[0-1]+)?", number)) 
+                if (!Pattern.matches("-?[0-1]+([,]?[0-1]+)?", number)) 
                     return INVALID_NUMBER;
                 
                 decimal = convertFromBerg(number);
@@ -181,10 +194,14 @@ public class Converter {
 
         switch(toBase) {
             case "FACT":
+                if (decimal.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) != 0)
+                    return INVALID_NUMBER;
                 result = String.valueOf(convertToFact(decimal));
                 break;
             
             case "FIB":
+                if (decimal.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) != 0)
+                    return INVALID_NUMBER;
                 result = String.valueOf(convertToFib(decimal));
                 break;
 
@@ -275,7 +292,7 @@ public class Converter {
             integer = integer.divideToIntegralValue(base);
             resultInteger = ALPHABET.charAt(remainder) + resultInteger;
         }
-        while (fraction.compareTo(BigDecimal.ZERO) != 0 && resultFraction.length() < 5) {
+        while (fraction.compareTo(BigDecimal.ZERO) != 0 && resultFraction.length() < FRACTION_DIGITS) {
             int remainder = fraction.multiply(base).intValue();
             fraction = fraction.multiply(base).remainder(BigDecimal.ONE);
             resultFraction += ALPHABET.charAt(remainder);
@@ -323,8 +340,14 @@ public class Converter {
 
 
     private static BigDecimal convertFromFact(String number) {
+        boolean isNegative = false;
         BigDecimal decimal = BigDecimal.ZERO;
         
+        if (number.startsWith("-")) {
+            isNegative = true;
+            number = number.substring(1);
+        }
+
         for (int i = 0; i < number.length(); i++) {
             decimal = decimal.add(
                 BigDecimal.valueOf(ALPHABET.indexOf(number.charAt(i)))
@@ -332,16 +355,27 @@ public class Converter {
             );
         }
         
+        if (isNegative) decimal = decimal.negate();
+
         return decimal;
     }
 
     private static String convertToFact(BigDecimal decimal) {
+        boolean isNegative = false;
         String result = "";
+
+
+        if (decimal.compareTo(BigDecimal.ZERO) < 0) {
+            isNegative = true;
+            decimal = decimal.negate();
+        }
 
         for (int i = 2; decimal.compareTo(BigDecimal.ZERO) > 0; i++) {
             result = ALPHABET.charAt((decimal.remainder(BigDecimal.valueOf(i)).intValue())) + result;
             decimal = decimal.divideToIntegralValue(BigDecimal.valueOf(i));
         }
+
+        if (isNegative) result = "-" + result;
 
         return result;
     }
@@ -355,7 +389,13 @@ public class Converter {
     }
 
     private static BigDecimal convertFromFib(String number) {
+        boolean isNegative = false;
         BigDecimal decimal = BigDecimal.ZERO;
+        
+        if (number.startsWith("-")) {
+            isNegative = true;
+            number = number.substring(1);
+        }
 
         for (int i = 0; i < number.length(); i++) {
             decimal = decimal.add(
@@ -364,20 +404,31 @@ public class Converter {
             );
         }
         
+        if (isNegative) decimal = decimal.negate();
+
         return decimal;
     }
 
     private static BigInteger convertToFib(BigDecimal decimal) {
         if (decimal.compareTo(BigDecimal.ZERO) == 0) return BigInteger.ZERO;
 
+        boolean isNegative = false;
         BigInteger result;
         int i = 2;
+
+        if (decimal.compareTo(BigDecimal.ZERO) < 0) {
+            isNegative = true;
+            decimal = decimal.negate();
+        }
 
         while (decimal.compareTo(getFibonacci(i + 1)) > 0) {
             i++;
         }
 
-        result = BigInteger.valueOf((long) Math.pow(10, i - 2)).add(convertToFib(decimal.subtract(getFibonacci(i))));
+        result = BigInteger.valueOf((long) Math.pow(10, i - 2))
+                .add(convertToFib(decimal.subtract(getFibonacci(i))));
+
+        if (isNegative) result = result.negate();
 
         return result;
     }
@@ -391,7 +442,13 @@ public class Converter {
     }
 
     private static BigDecimal convertFromBerg(String number) {
+        boolean isNegative = false;
         BigDecimal decimal = BigDecimal.ZERO;
+
+        if (number.startsWith("-")) {
+            isNegative = true;
+            number = number.substring(1);
+        }
 
         if (number.contains(",")) {
             BigDecimal integer = BigDecimal.ZERO;
@@ -420,18 +477,29 @@ public class Converter {
                 );
             }
         }
-    
-        return decimal.setScale(5, RoundingMode.HALF_UP);
+        
+        decimal = decimal.setScale(5, RoundingMode.HALF_UP);
+
+        if (isNegative) decimal = decimal.negate();
+
+        return decimal;
     }
 
     private static BigDecimal convertToBerg(BigDecimal decimal) {
         long precision = (long) Math.pow(10, 10);
 
         if (decimal.multiply(BigDecimal.TEN.multiply(BigDecimal.valueOf(precision)))
-                .abs().toBigInteger().compareTo(BigInteger.ZERO) == 0) 
+            .abs().toBigInteger().compareTo(BigInteger.ZERO) == 0) 
             return BigDecimal.ZERO;
 
+        boolean isNegative = false;
         BigDecimal result = BigDecimal.ZERO;
+
+        if (decimal.compareTo(BigDecimal.ZERO) < 0) {
+            isNegative = true;
+            decimal = decimal.negate();
+        }
+
         int power = (int) Math.round(Math.log(decimal.longValue()) / Math.log(GOLDEN_RATIO.doubleValue()));
 
         while (decimal.subtract(GOLDEN_RATIO.pow(power, MATH_CONTEXT))
@@ -448,7 +516,9 @@ public class Converter {
         }
 
         result = BigDecimal.valueOf(Math.pow(10, power))
-                    .add(convertToBerg(decimal.subtract(GOLDEN_RATIO.pow(power, MATH_CONTEXT))));
+                .add(convertToBerg(decimal.subtract(GOLDEN_RATIO.pow(power, MATH_CONTEXT))));
+
+        if (isNegative) result = result.negate();
 
         return result;
     }
