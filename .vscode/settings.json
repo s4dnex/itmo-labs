@@ -1,6 +1,7 @@
 {
     "conventionalCommits.scopes": [
         "inf/lab1",
+        "inf/lab2",
         "prog/lab1",
         "opd/lab1",
         "prog/lab0",
