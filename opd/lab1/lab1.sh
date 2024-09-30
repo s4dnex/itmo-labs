@@ -1,6 +1,7 @@
 # Author: Nikita "sadnex" Ryazanov
 # Variant: 5013
 
+
 # 1. create folders and files
 mkdir lab0
 cd lab0
@@ -53,6 +54,7 @@ Rissile Gyro Bau Iron Defense Mirror Shot Ingrain selfdestruct power
 Whip Iron Head payback Flash Cannon Explosion" > ferrothorn
 cd ..
 
+
 # 2. set permissions
 chmod 750 golduck4
 chmod u=,g=,o=rw golduck4/sneasel
@@ -71,21 +73,29 @@ chmod 006 wormadam7/donphan
 chmod 400 wormadam7/mienshao
 chmod u=r,g=r,o=r wormadam7/ferrothorn
 
+
 # 3. copy and link files
+
+# 3.1
 ln -s $(pwd)/nidoranF7 $(pwd)/golduck4/sneaselnidoranF
 
+# 3.2
 chmod u=rwx magcargo6/exeggcute
 cat magcargo6/exeggcute magcargo6/exeggcute > nidoranF7_47
 chmod 006 magcargo6/exeggcute
 
+# 3.3
 ln petilil3 golduck4/sneaselpetilil
 
+# 3.4
 chmod u=rwx pichu0
 cat pichu0 > golduck4/delcattypichu
 chmod 006 pichu0
 
+# 3.5
 cp nidoranF7 magcargo6/monferno
 
+# 3.6
 chmod u=rwx -R wormadam7
 cp -R wormadam7 golduck4/krokorok
 chmod u=rx,g=rwx,o=rwx wormadam7/pansage
@@ -93,7 +103,16 @@ chmod 006 wormadam7/donphan
 chmod 400 wormadam7/mienshao
 chmod u=r,g=r,o=r wormadam7/ferrothorn
 
+# 3.7
 ln -s wormadam7 Copy_97
+
+
+# print directory tree of lab0
+
+echo "directory tree of lab0 after 1-3"
+ls -l -R
+echo ""
+
 
 # 4. find and filter files
 
@@ -101,43 +120,55 @@ mkdir /tmp 2>> /dev/null
 touch /tmp/log
 chmod 777 /tmp/log
 
-#for f in golduck4/*; do
-#if [[ -f $f ]]
-#then
-#echo $(wc -l $f 2>> tmp/log) 2>> tmp/log
-#fi
-#done | grep . | sort -n
-
+# 4.1
+echo "4.1"
 cd golduck4
 ls -L --zero -p 2>> /tmp/log | grep -v "/$" -z | wc -l --total=never --files0-from=- 2>> /tmp/log | sort -g
 cd ..
-echo -e ""
+echo ""
 
-ls -R -o -h -p -L 2> /dev/null | grep -v "^$" | grep -v ":$" | grep -v "^total" | grep -v "/$" | sort -u | sort -r -h -k 4 | tail -n 3
-echo -e ""
+# 4.2
+echo "4.2"
+ls -R -o -h -p -L 2>> /dev/null | grep -v "^$" | grep -v ":$" | grep -v "^total" | grep -v "/$" | sort -u | sort -r -h -k 4 | tail -n 3
+echo ""
 
-cat golduck4/* | grep "li" --color=never
-echo -e ""
+# 4.3
+echo "4.3"
+cat golduck4/* 2>&1 | grep "li" --color=never 2>&1
+echo ""
 
-cat golduck4/sneasel golduck4/delcatty magcargo6/growlithe magcargo6/exeggcute wormadam7/donphan 2> /dev/null | grep -v -i -n "e$"
-echo -e ""
+# 4.4
+echo "4.4"
+cat golduck4/sneasel golduck4/delcatty magcargo6/growlithe magcargo6/exeggcute wormadam7/donphan 2>> /dev/null | grep -v -i -n "e$"
+echo ""
 
-ls -R -o -h -p -t 2> /dev/null | grep -v "^$" | grep -v ":$" | grep -v "^total" | grep -v "/$" | grep "n$" --color=never | head -n 2
-echo -e ""
+# 4.5
+echo "4.5"
+ls -R -o -h -p -t 2>> /dev/null | grep -v "^$" | grep -v ":$" | grep -v "^total" | grep -v "/$" | grep "n$" --color=never | head -n 2
+echo ""
 
-grep -n -h "" $( ls -R -p -L 2> /dev/null | grep -v "^$" | grep -v ":$" | grep -v "/$" | sort -u | grep "^p" ) 2> /dev/null | sort -d
+# 4.6
+echo "4.6"
+grep -R --include=p* -n -h "" 2>> /dev/null | sort -u | sort -d
+echo ""
+
+# grep -n -h "" $( ls -R -p -L 2>> /dev/null | grep -v "^$" | grep -v ":$" | grep -v "/$" | sort -u | grep "^p" ) 2>> /dev/null | sort -d
 
 
 # 5. delete files and links
 
 chmod 777 nidoranF7
 rm nidoranF7
-chmod 777 golduck4/sneasel
+chmod -R 777 golduck4
 rm golduck4/sneasel
 rm golduck4/sneaselnidora*
-chmod 777 golduck4/sneaselpetil*
 rm golduck4/sneaselpetil*
-#rm -rf golduck4
+rm -rf golduck4
 rmdir wormadam7/pansage
 
 
+# print directory tree of lab0
+
+echo "directory tree of lab0 after 1-5"
+ls -l -R
+echo ""
