@@ -96,7 +96,7 @@ chmod 006 pichu0
 cp nidoranF7 magcargo6/monferno
 
 # 3.6
-chmod u=rwx -R wormadam7
+chmod -R u=rwx wormadam7
 cp -R wormadam7 golduck4/krokorok
 chmod u=rx,g=rwx,o=rwx wormadam7/pansage
 chmod 006 wormadam7/donphan
@@ -123,18 +123,19 @@ chmod 777 /tmp/log
 # 4.1
 echo "4.1"
 cd golduck4
-ls -L --zero -p 2>> /tmp/log | grep -v "/$" -z | wc -l --total=never --files0-from=- 2>> /tmp/log | sort -g
+# ls -L --zero -p 2>> /tmp/log | grep -v "/$" -z | wc -l --total=never --files0-from=- 2>> /tmp/log | sort -g
+wc -l $( ls -L -p | grep -v "/$" ) 2>> /tmp/log | grep -v "total$"
 cd ..
 echo ""
 
 # 4.2
 echo "4.2"
-ls -R -o -h -p -L 2>> /dev/null | grep -v "^$" | grep -v ":$" | grep -v "^total" | grep -v "/$" | sort -u | sort -r -h -k 4 | tail -n 3
+ls -R -l -h -p -L 2>> /dev/null | grep -v "^$" | grep -v ":$" | grep -v "^total" | grep -v "/$" | sort -u | sort -r -h -k 5 | tail -n 3
 echo ""
 
 # 4.3
 echo "4.3"
-cat golduck4/* 2>&1 | grep "li" --color=never 2>&1
+cat golduck4/* 2>&1 | grep "li" --color=never
 echo ""
 
 # 4.4
@@ -144,14 +145,13 @@ echo ""
 
 # 4.5
 echo "4.5"
-ls -R -o -h -p -t 2>> /dev/null | grep -v "^$" | grep -v ":$" | grep -v "^total" | grep -v "/$" | grep "n$" --color=never | head -n 2
+ls -R -o -h -p -t 2>> /dev/null | grep "n$" --color=never | head -n 2
 echo ""
 
 # 4.6
 echo "4.6"
 grep -R --include=p* -n -h "" 2>> /dev/null | sort -u | sort -d
 echo ""
-
 # grep -n -h "" $( ls -R -p -L 2>> /dev/null | grep -v "^$" | grep -v ":$" | grep -v "/$" | sort -u | grep "^p" ) 2>> /dev/null | sort -d
 
 
