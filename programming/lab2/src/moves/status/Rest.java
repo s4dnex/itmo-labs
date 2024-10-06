@@ -1,4 +1,4 @@
-package moves;
+package moves.status;
 
 import ru.ifmo.se.pokemon.Effect;
 import ru.ifmo.se.pokemon.Pokemon;

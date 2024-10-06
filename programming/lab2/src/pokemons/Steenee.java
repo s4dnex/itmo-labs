@@ -1,6 +1,6 @@
 package pokemons;
 
-import moves.PlayNice;
+import moves.status.PlayNice;
 
 public class Steenee extends Bounsweet{
     public Steenee(String name, int level) {

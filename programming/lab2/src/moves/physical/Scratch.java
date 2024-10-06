@@ -1,19 +1,19 @@
-package moves;
+package moves.physical;
 
 import ru.ifmo.se.pokemon.PhysicalMove;
 import ru.ifmo.se.pokemon.Type;
 
-public class AerialAce extends PhysicalMove {
-    public AerialAce() {
+public class Scratch extends PhysicalMove {
+    public Scratch() {
         super(
-            Type.FLYING, // type
-            60, // power
+            Type.NORMAL, // type
+            40, // power
             1 // accuracy
         );
     }
 
     @Override
     protected String describe() {
-        return "uses Aerial Ace";
+        return "uses Scratch";
     }
 }

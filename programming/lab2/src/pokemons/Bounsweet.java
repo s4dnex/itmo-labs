@@ -1,7 +1,7 @@
 package pokemons;
 
-import moves.MagicalLeaf;
-import moves.Rest;
+import moves.special.MagicalLeaf;
+import moves.status.Rest;
 import ru.ifmo.se.pokemon.Pokemon;
 import ru.ifmo.se.pokemon.Type;
 

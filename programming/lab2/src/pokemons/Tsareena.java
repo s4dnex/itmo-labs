@@ -1,6 +1,6 @@
 package pokemons;
 
-import moves.MagicalLeaf;
+import moves.special.MagicalLeaf;
 
 public class Tsareena extends Steenee{
     public Tsareena(String name, int level) {

@@ -1,9 +1,9 @@
 package pokemons;
 
-import moves.Swagger;
-import moves.CrushClaw;
-import moves.Scratch;
-import moves.ThunderFang;
+import moves.physical.CrushClaw;
+import moves.physical.Scratch;
+import moves.physical.ThunderFang;
+import moves.status.Swagger;
 import ru.ifmo.se.pokemon.Pokemon;
 import ru.ifmo.se.pokemon.Type;
 

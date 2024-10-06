@@ -1,9 +1,9 @@
 package pokemons;
 
-import moves.AerialAce;
-import moves.AirSlash;
-import moves.CrushClaw;
-import moves.IceFang;
+import moves.physical.AerialAce;
+import moves.physical.CrushClaw;
+import moves.physical.IceFang;
+import moves.special.AirSlash;
 import ru.ifmo.se.pokemon.Pokemon;
 import ru.ifmo.se.pokemon.Type;
 
