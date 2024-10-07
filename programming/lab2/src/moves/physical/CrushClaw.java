@@ -26,6 +26,6 @@ public class CrushClaw extends PhysicalMove {
 
     @Override
     protected String describe() {
-        return "uses Crush Claw";
+        return "is using Crush Claw";
     }
 }

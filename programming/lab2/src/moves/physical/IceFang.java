@@ -24,6 +24,6 @@ public class IceFang extends PhysicalMove {
 
     @Override 
     protected String describe() {
-        return "uses Ice Fang";
+        return "is using Ice Fang";
     }
 }

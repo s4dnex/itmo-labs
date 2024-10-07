@@ -35,6 +35,6 @@ public class Rest extends StatusMove {
 
     @Override
     protected String describe() {
-        return "uses Rest";
+        return "is using Rest";
     }
 }

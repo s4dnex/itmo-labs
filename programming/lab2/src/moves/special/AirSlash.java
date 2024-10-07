@@ -23,6 +23,6 @@ public class AirSlash extends SpecialMove {
 
     @Override
     protected String describe() {
-        return "uses Air Slash";
+        return "is using Air Slash";
     }
 }

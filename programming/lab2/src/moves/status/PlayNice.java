@@ -21,6 +21,6 @@ public class PlayNice extends StatusMove{
 
     @Override
     protected String describe() {
-        return "uses Play Nice";
+        return "is using Play Nice";
     }
 }

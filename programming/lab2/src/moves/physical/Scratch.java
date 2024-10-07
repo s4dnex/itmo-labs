@@ -14,6 +14,6 @@ public class Scratch extends PhysicalMove {
 
     @Override
     protected String describe() {
-        return "uses Scratch";
+        return "is using Scratch";
     }
 }

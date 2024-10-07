@@ -14,6 +14,6 @@ public class MagicalLeaf extends SpecialMove {
 
     @Override
     protected String describe() {
-        return "uses Magical Leaf";
+        return "is using Magical Leaf";
     }
 }

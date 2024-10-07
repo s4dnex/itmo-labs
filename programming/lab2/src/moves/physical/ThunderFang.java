@@ -24,6 +24,6 @@ public class ThunderFang extends PhysicalMove {
 
     @Override
     protected String describe() {
-        return "uses Thunder Fang";
+        return "is using Thunder Fang";
     }
 }

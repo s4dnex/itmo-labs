@@ -23,6 +23,6 @@ public class Swagger extends StatusMove {
 
     @Override
     protected String describe() {
-        return "uses Swagger";
+        return "is using Swagger";
     }
 }

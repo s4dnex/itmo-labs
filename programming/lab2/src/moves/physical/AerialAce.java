@@ -14,6 +14,6 @@ public class AerialAce extends PhysicalMove {
 
     @Override
     protected String describe() {
-        return "uses Aerial Ace";
+        return "is using Aerial Ace";
     }
 }
