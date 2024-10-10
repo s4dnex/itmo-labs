@@ -1,6 +1,7 @@
 import re
 
 # ISU: 467307 
+# Nikita "sadnex" Ryazanov
 
 # 467307 % 6 = 3
 # 467307 % 4 = 3
