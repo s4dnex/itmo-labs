@@ -28,13 +28,7 @@ public class Main {
 			case 3:
 				return Math.log(Math.exp(Math.asin(Math.sin(x[j]))));
 			
-			case 5:
-			case 7:
-			case 9:
-			case 10:
-			case 14:
-			case 16:
-			case 17:
+			case 5, 7, 9, 10, 14, 16, 17:
 				return Math.cos(Math.cbrt(Math.asin((x[j] - 5.5) / 15)));
 			
 			default:
