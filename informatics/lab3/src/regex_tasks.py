@@ -45,7 +45,7 @@ texts = [
 ]
 
 print("Main task: ")
-pattern = re.compile(r"(?:\s)(:<\{\|)(?:\B)")
+pattern = re.compile(r"\s:<\{\|\B")
 for i, t in enumerate(texts):
     print(f'{i + 1}. {len(pattern.findall(t))}')
 print()
@@ -115,12 +115,16 @@ texts = [
     # Answer: "893 + 1593 = 4893"
 
     # 4
-    "18 / 3 = 6",
-    # Answer: "1289 / 29 = 137"
+    "18/3=6",
+    # Answer: "1289/29=137"
 
     # 5
-    "На столе 12 пирожков, а в холодильнике -8. Если я заберу 4 пирожка, останется 16. 12 плюс -4 равно 16."
+    "На столе 12 пирожков, а в холодильнике -8. Если я заберу 4 пирожка, останется 16. 12 плюс -4 равно 16.",
     # Answer: "На столе 569 пирожков, а в холодильнике 249. Если я заберу 57 пирожка, останется 1017. 569 плюс 57 равно 1017."
+
+    # 6
+    "0 + 0 = 0"
+    
 ]
 
 print("Additional task #2")
@@ -130,7 +134,7 @@ def func(x):
     x = int(x.group(0))
     return str(4 * x * x - 7)
 
-pattern = re.compile(r"-?[0-9]+")
+pattern = re.compile(r"[0-9]+")
 for i, t in enumerate(texts):
     print(f'{i + 1}.')
     print("Before: ")
