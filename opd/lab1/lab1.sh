@@ -1,7 +1,6 @@
 # Author: Nikita "sadnex" Ryazanov
 # Variant: 5013
 
-
 # 1. create folders and files
 mkdir lab0
 cd lab0
