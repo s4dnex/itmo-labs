@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schedule>
+    <Tuesday>
+        <lesson1>
+            <name>
+                Математический анализ
+            </name>   
+            <time>
+                <start>13:30</start>
+                <end>15:00</end>
+            </time>
+            <teacher>Милюшин Александр Сергеевич</teacher>
+            <weeks>1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16</weeks>
+            <group>Мат Ан 2.2</group>
+            <room>1314</room>
+            <building>ул.Ломоносова, д.9, лит. М</building>
+            <format>Очно</format>
+        </lesson1>
+    </Tuesday>
+
+    <Friday>
+        <lesson1>
+            <name>Линейная алгебра</name>   
+            <time>
+                <start>10:00</start>
+                <end>11:30</end>
+            </time>
+            <teacher>Ефремов Илья Дмитриевич</teacher>
+            <weeks>1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16</weeks>
+            <group>Лин Алг 3.3</group>
+            <room>2201</room>
+            <building>Кронверкский пр., д.49, лит.А</building>
+            <format>Очно</format>
+        </lesson1>
+
+        <lesson2>
+            <name>Английский язык</name>   
+            <time>
+                <start>15:20</start>
+                <end>16:50</end>
+            </time>
+            <teacher>Бревнова Татьяна Сергеевна</teacher>
+            <weeks>1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16</weeks>
+            <group>АЯ-B1.2/49</group>
+            <room>3308</room>
+            <building>ул.Ломоносова, д.9, лит. М</building>
+            <format>Очно</format>
+        </lesson2>
+
+        <lesson3>
+            <name>Английский язык</name>   
+            <time>
+                <start>17:00</start>
+                <end>18:30</end>
+            </time>
+            <teacher>Бревнова Татьяна Сергеевна</teacher>
+            <weeks>1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16</weeks>
+            <group>АЯ-B1.2/49</group>
+            <room>3308</room>
+            <building>ул.Ломоносова, д.9, лит. М</building>
+            <format>Очно</format>
+        </lesson3>
+    </Friday>
+</schedule>
