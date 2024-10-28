@@ -76,7 +76,9 @@ chmod u=r,g=r,o=r wormadam7/ferrothorn
 # 3. copy and link files
 
 # 3.1
-ln -s $(pwd)/nidoranF7 $(pwd)/golduck4/sneaselnidoranF
+cd golduck4
+ln -s ../nidoranF7 sneaselnidoranF
+cd ..
 
 # 3.2
 chmod u=rwx magcargo6/exeggcute
