@@ -11,4 +11,4 @@ with open(r'etc\my_schedule.xml', 'r', encoding='utf-8') as f:
 json = xml_to_json.convert_raw(xml)
 
 with open(r'etc\my_schedule.json', 'w', encoding='utf-8') as f:
-    f.writelines('\n'.join(json))
+    f.writelines(json)
