@@ -1,19 +1,32 @@
+# Author: Nikita "sadnex" Ryazanov
+
 from typing import List
+import xmltodict
+import json
+import re
 
-INDENT = ' ' * 4
 
-def convert_raw(xml: List[str]) -> List[str]:
+JSON_INDENT = ' ' * 4
+
+
+def xml_list_to_string(xml_list: List[str]) -> str:
     """
-    Convert XML (represented in list of strings) to JSON (represented in list of strings).
+    Convert XML (represented in list of strings) to string.
+    """
+    return ''.join([l.strip() for l in xml_list if l.strip()])
+
+
+def convert_raw(xml_list: List[str]) -> str:
+    """
+    Convert XML (represented in list of strings) to JSON (represented in string).
     This method doesn't use any libraries, regex and etc. 
     """
 
-    # Convert XML to 1-line string
-    xml = ''.join([l.strip() for l in xml if l.strip()])
-    xml = xml[xml.index('?>') + 2:]
+    xml_str = xml_list_to_string(xml_list)
+    xml_str = xml_str[xml_str.index('?>') + 2:]
     
-    # Array of JSON strings
-    json = ['{']
+    # List of JSON strings
+    json_list = ['{']
     # Index of current bracket
     br = -1
     # Counter of unclosed tags
@@ -21,15 +34,15 @@ def convert_raw(xml: List[str]) -> List[str]:
 
     # List of tag brackets in order
     brs = []
-    for i in range(len(xml)):
-        if xml[i:i+2] == '</':
+    for i in range(len(xml_str)):
+        if xml_str[i:i+2] == '</':
             brs.append('</')
-        elif xml[i] == '<':
+        elif xml_str[i] == '<':
             brs.append('<')
     
     i = 0
-    while i < len(xml):
-        if xml[i:i + 2] == '</':
+    while i < len(xml_str):
+        if xml_str[i:i + 2] == '</':
             br += 1
             unclosed_tags -= 1
 
@@ -39,112 +52,109 @@ def convert_raw(xml: List[str]) -> List[str]:
 
             # If next tag is closing tag too then this tag is nested, so close parent tag with curly bracket 
             if brs[br + 1] == '</':
-                json.append(INDENT * unclosed_tags + '}' + \
+                json_list.append(JSON_INDENT * unclosed_tags + '}' + \
                 # If there is another tag after this then add comma                            
                             (',' if (br + 1 < len(brs) and brs[br + 1] == '<') else ''))
             # If next tag is opening tag then add comma
             else:
-                json[-1] += ','
+                json_list[-1] += ','
 
             # Move to end of this tag
-            i = xml.index('>', i + 1)
+            i = xml_str.index('>', i + 1)
         
-        elif xml[i] == '<':
+        elif xml_str[i] == '<':
             br += 1
             unclosed_tags += 1
             # Add formatted tag to key
-            json.append(INDENT * unclosed_tags + '"' + xml[i + 1: xml.index('>', i + 1)] + '": ')
+            json_list.append(JSON_INDENT * unclosed_tags + '"' + xml_str[i + 1: xml_str.index('>', i + 1)] + '": ')
             # Move to end of this tag
-            i = xml.index('>', i + 1)
+            i = xml_str.index('>', i + 1)
         
-        elif xml[i] == '>':
+        elif xml_str[i] == '>':
             # If next tag is opening tag too then add curly bracket (because next tag is nested in this)
             if brs[br] == '<' and brs[br + 1] == '<':
-                json[-1] += '{'
+                json_list[-1] += '{'
             # Increment index
             i += 1
         
         else:
             # Add value of current tag to last key
-            json[-1] += '"' + xml[i:xml.index('</', i + 1)] + '"'
+            json_list[-1] += '"' + xml_str[i:xml_str.index('</', i + 1)] + '"'
             # Move to closing tag
-            i = xml.index('</', i + 1)
+            i = xml_str.index('</', i + 1)
     
     # Add closing bracket of JSON file
-    json.append('}')
-    return '\n'.join(json)
+    json_list.append('}')
+    return '\n'.join(json_list)
 
 
-def test(xml: List[str]) -> List[str]:
-    json = ['{\n']
-    stack = deque()
-    index = -1
-    open_tags = 0
-    closed_tags = 0
+def convert_lib(xml_list: List[str]) -> str:
+    """
+    Convert XML (represented in list of strings) to JSON (represented in string).
+    This method uses standard json library and xmltodict package by martinblech.
+    """
+    return json.dumps(
+        xmltodict.parse(''.join(xml_list)), 
+        ensure_ascii=False, 
+        indent=JSON_INDENT
+    )
 
-    for l in xml[1:]:
-        l = l.strip()
-        for i in range(len(l)):
-            if l[i:i+2] == '</':
-                stack.append('</')
-        #         stack.pop()
-        #         break
-            elif l[i] == '<':
-                stack.append('<')
-        #         cur_str += INDENT * len(stack) + '"'
-        #     elif l[i] == '>':
-        #         cur_str += '": {'
-        #     else:
-        #         cur_str += l[i]
-        
-        # if cur_str:
-        #     json += cur_str + "\n" + INDENT * (len(stack) - 1) + "},\n"
-    
-    for l in xml[1:]:
-        cur_str = ''
-        l = l.strip()
-        for i in range(len(l)):
-            if l[i:i+2] == '</':
-                closed_tags += 1
-                if stack[index + 1] == '</':
-                    cur_str += INDENT * (open_tags - closed_tags - 1) + '},\n'
-                index += 1
-                break
-            elif l[i] == '<':
-                open_tags += 1
-                cur_str += INDENT * (open_tags - closed_tags) + '"'
-                index += 1
-            elif l[i] == '>':
-                cur_str += '": '
-                if stack[index + 1] == '<':
-                    cur_str += '{'
-                else:
-                    cur_str += '"'
-            else:
-                cur_str += l[i]
-        
-        if cur_str:
-            if stack[index - 1] == '</' and stack[index] == '</':
-                cur_str += INDENT * (open_tags - closed_tags - 1) + '},\n'
-            elif stack[index] == '<' and stack[index + 1] == '<':
-                cur_str += '\n'
-            elif stack[index] == '</' and stack[index + 1] == '<':
 
-                pass
-                # cur_str += '"'
-                # if stack[index] == '<':
-                #     cur_str += ',\n'
-                # else:
-                #     cur_str += '\n'
+def convert_regex(xml_list: List[str]) -> str:
+    """
+    Convert XML (represented in list of strings) to JSON (represented in string).
+    This method uses regex.
+    """
+    xml_str = xml_list_to_string(xml_list)
+    xml_str = xml_str[xml_str.index('?>') + 2:]
+
+    json_list = ['{']
+
+    open_tag_pattern = re.compile(r'<(.*?)>')
+    close_tag_pattern = re.compile(r'</(.*?)>')
+    value_pattern = re.compile(r'>(.*?)<')
+
+    i = 0
+    tags = []
+    while i < len(xml_str):
+        if match := close_tag_pattern.match(xml_str, i):
+            tags.append(("close_tag", match.group(1)))
+            i += len(match.group(0))
+        elif match := open_tag_pattern.match(xml_str, i):
+            tags.append(("open_tag", match.group(1)))
+            i += len(match.group(0))
+        elif match := value_pattern.match(xml_str, i - 1):
+            tags.append(("value", match.group(1)))
+            i += len(match.group(1)) 
         else:
-            continue
+            raise ValueError(f"Invalid XML")
         
-        if l and l[0] != '<':
-            json[-1] += cur_str + '"\n'
-        else:
-            json.append(cur_str)
+    unclosed_tags = 0
+    for i in range(len(tags) - 1):
+        type, value = tags[i]
+        
+        if type == "open_tag":
+            unclosed_tags += 1
+            json_list.append(
+                JSON_INDENT * unclosed_tags + \
+                '"' + value + '": ' + \
+                ('{' if  ((i+1) < len(tags)) and (tags[i + 1][0] == "open_tag") else '')
+            )
 
+        elif type == "close_tag":
+            unclosed_tags -= 1
+            if tags[i + 1][0] == "close_tag":
+                json_list.append(
+                    JSON_INDENT * unclosed_tags + \
+                    '}' + \
+                    (',' if ((i+1) < len(tags)) and (tags[i + 1][0] == "open_tag") else '')
+                )
+            elif tags[i + 1][0] == "open_tag":
+                json_list[-1] += ','
 
-    json.append('\n}')
-    return json
+        elif type == "value":
+            json_list[-1] += '"' + value + '"'
 
+    json_list.append('}')
+
+    return '\n'.join(json_list)
