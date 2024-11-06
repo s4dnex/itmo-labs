@@ -6,15 +6,19 @@ import json
 import re
 
 JSON_INDENT = ' ' * 4
-TAG_PATTERN = re.compile(r'<(?P<tag>.*?)>(.*)</(?P=tag)>')
+TAG_PATTERN = re.compile(r'<(?P<tag>.*?)>(.*?)</(?P=tag)>')
 
 def xml_list_to_string(xml_list: List[str]) -> str:
     """
     Convert XML (represented as a list of strings) to string with removed leading and trailing whitespaces.
     """
-    return ''.join([l.strip() for l in xml_list if (l.strip() and not(l.strip().endswith('?>')))])
+    return ''.join([l.strip() if l.rstrip().endswith('>') else l.lstrip().replace('\n', '') 
+                    for l in xml_list 
+                    if (l.strip() and not(l.strip().endswith('?>')))
+                    ])
 
 
+# TODO: Handle XML comments and self-closing tags
 def convert_raw(xml_list: List[str]) -> str:
     """
     Convert XML (represented as a list of strings) to JSON (represented as a string).
@@ -119,12 +123,14 @@ def __replace_tag(match: tuple, unclosed_tags: int = 1) -> str:
         scope[-1] = scope[-1][:-1]
         # Close current tag
         scope.append(f'{JSON_INDENT * unclosed_tags}' + '}')
+        # Return current scope as a string
         return '\n'.join(scope)
     
-    # If there are no nested tags return formatted tag
+    # If there are no nested tags return formatted tag as a key-value pair
     return f'{JSON_INDENT * unclosed_tags}"{match[0]}": "{match[1]}"'
 
 
+# TODO: Handle XML comments and self-closing tags
 def convert_regex(xml_list: List[str]) -> str:
     """
     Convert XML (represented in list of strings) to JSON (represented in string).
@@ -143,3 +149,5 @@ def convert_regex(xml_list: List[str]) -> str:
 
     # (Add closing bracket and) return JSON as a string 
     return json_str + '\n}'
+
+

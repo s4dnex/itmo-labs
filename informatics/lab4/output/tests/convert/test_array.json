@@ -1,0 +1,12 @@
+{
+    "root": {
+        "person": [
+            {
+                "name": "John"
+            },
+            {
+                "name": "Jane"
+            }
+        ]
+    }
+}
