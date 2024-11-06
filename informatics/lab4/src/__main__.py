@@ -1,8 +1,8 @@
 # Author: Nikita "sadnex" Ryazanov
 # Variant: 7
 
-
 import xml_to_json
+
 
 if __name__ == '__main__':
     xml_list = []

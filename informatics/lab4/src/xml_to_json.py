@@ -5,12 +5,15 @@ import xmltodict
 import json
 import re
 
+
 JSON_INDENT = ' ' * 4
 TAG_PATTERN = re.compile(r'<(?P<tag>.*?)>(.*?)</(?P=tag)>')
 
+
+@staticmethod
 def xml_list_to_string(xml_list: List[str]) -> str:
     """
-    Convert XML (represented as a list of strings) to string with removed leading and trailing whitespaces.
+    Converts XML (represented as a list of strings) to string with removed leading and trailing whitespaces.
     """
     return ''.join([l.strip() if l.rstrip().endswith('>') else l.lstrip().replace('\n', '') 
                     for l in xml_list 
@@ -19,9 +22,10 @@ def xml_list_to_string(xml_list: List[str]) -> str:
 
 
 # TODO: Handle XML comments and self-closing tags
+@staticmethod
 def convert_raw(xml_list: List[str]) -> str:
     """
-    Convert XML (represented as a list of strings) to JSON (represented as a string).
+    Converts XML (represented as a list of strings) to JSON (represented as a string).
     This method doesn't use any libraries, regex and etc. 
     """
     # Convert XML to string
@@ -90,9 +94,10 @@ def convert_raw(xml_list: List[str]) -> str:
     return '\n'.join(json_list)
 
 
+@staticmethod
 def convert_lib(xml_list: List[str]) -> str:
     """
-    Convert XML (represented as a list of strings) to JSON (represented as a string).
+    Converts XML (represented as a list of strings) to JSON (represented as a string).
     This method uses standard json library and xmltodict package by martinblech.
     """
     return json.dumps(
@@ -104,7 +109,7 @@ def convert_lib(xml_list: List[str]) -> str:
 
 def __replace_tag(match: tuple, unclosed_tags: int = 1) -> str:
     """
-    Recursively replace XML tag to JSON format (represented as a string).
+    Recursively replaces XML tag to JSON format (represented as a string).
     """
     # Check that match is not None
     if match:
@@ -131,9 +136,10 @@ def __replace_tag(match: tuple, unclosed_tags: int = 1) -> str:
 
 
 # TODO: Handle XML comments and self-closing tags
+@staticmethod
 def convert_regex(xml_list: List[str]) -> str:
     """
-    Convert XML (represented in list of strings) to JSON (represented in string).
+    Converts XML (represented in list of strings) to JSON (represented in string).
     This method uses regex.
     """
     # Convert XML to string
