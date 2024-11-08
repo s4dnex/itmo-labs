@@ -64,6 +64,20 @@ class TestConvert(ABC):
         Tests conversion of XML with empty tags.
         """
         pass
+
+    @abstractmethod
+    def test_attributes(self):
+        """
+        Tests conversion of XML with attributes.
+        """
+        pass
+
+    @abstractmethod
+    def test_all_in_one(self):
+        """
+        Tests conversion of all-in-one XML.
+        """
+        pass
     
 
 class MyTestResult(unittest.TextTestResult):
@@ -81,19 +95,19 @@ class MyTestResult(unittest.TextTestResult):
     def addSuccess(self, test):
         super().addSuccess(test)
         # Log test result
-        self.log.info('{0:<20} {1:<20} {2}'.format(test.__class__.__name__, test._testMethodName, 'PASS'))
+        self.log.info('{0:<30} {1:<20} {2}'.format(test.__class__.__name__, test._testMethodName, 'PASS'))
           
 
     def addError(self, test, err):
         super().addError(test, err)
         # Log test result
-        self.log.info('{0:<20} {1:<20} {2}'.format(test.__class__.__name__, test._testMethodName, 'ERROR'))
+        self.log.info('{0:<30} {1:<20} {2}'.format(test.__class__.__name__, test._testMethodName, 'ERROR'))
             
     
     def addFailure(self, test, err):
         super().addFailure(test, err)
         # Log test result
-        self.log.info('{0:<20} {1:<20} {2}'.format(test.__class__.__name__, test._testMethodName, 'FAIL'))
+        self.log.info('{0:<30} {1:<20} {2}'.format(test.__class__.__name__, test._testMethodName, 'FAIL'))
 
 
 # Tests of convert_raw method
@@ -120,6 +134,12 @@ class TestConvertRaw(TestConvert, unittest.TestCase):
     def test_empty_tags(self):
         self.assertTrue(test_file(self.method, 'test_empty_tags', self.log))
 
+    def test_attributes(self):
+        self.assertTrue(test_file(self.method, 'test_attributes', self.log))
+
+    def test_all_in_one(self):
+        self.assertTrue(test_file(self.method, 'test_all_in_one', self.log))
+
 
 # Tests of convert_lib method
 class TestConvertLib(TestConvert, unittest.TestCase):
@@ -144,6 +164,12 @@ class TestConvertLib(TestConvert, unittest.TestCase):
     
     def test_empty_tags(self):
         self.assertTrue(test_file(self.method, 'test_empty_tags', self.log))
+    
+    def test_attributes(self):
+        self.assertTrue(test_file(self.method, 'test_attributes', self.log))
+    
+    def test_all_in_one(self):
+        self.assertTrue(test_file(self.method, 'test_all_in_one', self.log))
 
 
 # Tests of convert_regex method
@@ -170,8 +196,44 @@ class TestConvertRegex(TestConvert, unittest.TestCase):
     def test_empty_tags(self):
         self.assertTrue(test_file(self.method, 'test_empty_tags', self.log))
 
+    def test_attributes(self):
+        self.assertTrue(test_file(self.method, 'test_attributes', self.log))
+
+    def test_all_in_one(self):
+        self.assertTrue(test_file(self.method, 'test_all_in_one', self.log))
 
 
+# Tests of convert_formal_grammar method
+class TestConvertFormalGrammar(TestConvert, unittest.TestCase):
+    method = xml_to_json.convert_formal_grammar
+
+    # Create logger for test results
+    log = logging.getLogger('ConvertFormalGrammar')
+    log.setLevel(logging.DEBUG)
+    log.addHandler(logging.FileHandler(r'output\logs\convert_formal_grammar.log', 'w', 'utf-8'))
+    
+    def test_basic(self):
+        self.assertTrue(test_file(self.method, 'test_basic', self.log))
+    
+    def test_schedule(self):
+        self.assertTrue(test_file(self.method, 'test_schedule', self.log))
+    
+    def test_comments(self):
+        self.assertTrue(test_file(self.method,'test_comments', self.log))
+    
+    def test_array(self):
+        self.assertTrue(test_file(self.method, 'test_array', self.log))
+    
+    def test_empty_tags(self):
+        self.assertTrue(test_file(self.method, 'test_empty_tags', self.log))
+
+    def test_attributes(self):
+        self.assertTrue(test_file(self.method, 'test_attributes', self.log))
+
+    def test_all_in_one(self):
+        self.assertTrue(test_file(self.method, 'test_all_in_one', self.log))
+     
+        
 if __name__ == '__main__':
     # Run all tests
     unittest.main(

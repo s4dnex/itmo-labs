@@ -1,0 +1,23 @@
+{
+    "root": {
+        "basic": "value",
+        "array": [
+            {
+                "person": "John"
+            },
+            {
+                "person": "Jane"
+            }
+        ],
+        "attributes": {
+            "@age": "30",
+            "@job": "programmer"
+        },
+        "empty_tag": [
+            null,
+            null
+        ],
+        "empty_tag_2": null,
+        "empty_tag3": null
+    }
+}
