@@ -4,6 +4,7 @@ from typing import List
 import xmltodict
 import json
 import re
+from parser import Parser
 
 
 JSON_INDENT = ' ' * 4
@@ -15,13 +16,13 @@ def xml_list_to_string(xml_list: List[str]) -> str:
     """
     Converts XML (represented as a list of strings) to string with removed leading and trailing whitespaces.
     """
-    return ''.join([l.strip() if l.rstrip().endswith('>') else l.lstrip().replace('\n', '') 
+    return ''.join([l.strip() if l.rstrip().endswith('>') else l.lstrip().rstrip('\n') 
                     for l in xml_list 
                     if (l.strip() and not(l.strip().endswith('?>')))
                     ])
 
 
-# TODO: Handle XML comments and self-closing tags
+# INFO: Doesn't handle XML comments, self-closing tags and attributes
 @staticmethod
 def convert_raw(xml_list: List[str]) -> str:
     """
@@ -135,7 +136,7 @@ def __replace_tag(match: tuple, unclosed_tags: int = 1) -> str:
     return f'{JSON_INDENT * unclosed_tags}"{match[0]}": "{match[1]}"'
 
 
-# TODO: Handle XML comments and self-closing tags
+# INFO: Doesn't handle XML comments, self-closing tags and attributes
 @staticmethod
 def convert_regex(xml_list: List[str]) -> str:
     """
@@ -157,3 +158,19 @@ def convert_regex(xml_list: List[str]) -> str:
     return json_str + '\n}'
 
 
+@staticmethod
+def convert_formal_grammar(xml_list: List[str]) -> str:
+    """
+    Converts XML (represented in list of strings) to JSON (represented in string).
+    This method uses formal grammar.
+    """
+    # Convert XML to string
+    xml_str = xml_list_to_string(xml_list)
+    
+    parser = Parser(xml_str)
+    
+    return json.dumps(
+        parser.parse(),
+        ensure_ascii=False, 
+        indent=JSON_INDENT
+    )
