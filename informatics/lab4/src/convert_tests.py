@@ -6,6 +6,7 @@ import logging
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 
+STRING_FORMAT = '{0:<30} {1:<20} {2}'
 
 def test_file(method: Callable, filename: str, log: logging.Logger = None) -> bool:
         """
@@ -95,19 +96,19 @@ class MyTestResult(unittest.TextTestResult):
     def addSuccess(self, test):
         super().addSuccess(test)
         # Log test result
-        self.log.info('{0:<30} {1:<20} {2}'.format(test.__class__.__name__, test._testMethodName, 'PASS'))
+        self.log.info(STRING_FORMAT.format(test.__class__.__name__, test._testMethodName, 'PASS'))
           
 
     def addError(self, test, err):
         super().addError(test, err)
         # Log test result
-        self.log.info('{0:<30} {1:<20} {2}'.format(test.__class__.__name__, test._testMethodName, 'ERROR'))
+        self.log.info(STRING_FORMAT.format(test.__class__.__name__, test._testMethodName, 'ERROR'))
             
     
     def addFailure(self, test, err):
         super().addFailure(test, err)
         # Log test result
-        self.log.info('{0:<30} {1:<20} {2}'.format(test.__class__.__name__, test._testMethodName, 'FAIL'))
+        self.log.info(STRING_FORMAT.format(test.__class__.__name__, test._testMethodName, 'FAIL'))
 
 
 # Tests of convert_raw method
