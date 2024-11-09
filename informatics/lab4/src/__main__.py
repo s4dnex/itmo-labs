@@ -2,7 +2,7 @@
 # Variant: 7
 
 import xml_to_json
-
+import xml_to_tsv
 
 if __name__ == '__main__':
     xml_list = []
@@ -28,4 +28,9 @@ if __name__ == '__main__':
     with open(r'output\my_schedule_formal_grammar.json', 'w', encoding='utf-8') as f:
         f.writelines(
             xml_to_json.convert_formal_grammar(xml_list)
+        )
+
+    with open(r'output\my_schedule.tsv', 'w', encoding='utf-8') as f:
+        f.writelines(
+            xml_to_tsv.convert(xml_list)
         )
