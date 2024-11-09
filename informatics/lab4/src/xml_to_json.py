@@ -148,11 +148,11 @@ def convert_regex(xml_list: List[str]) -> str:
     
     json_str = '{\n'
     
-    # Find 1-level tags (main tags)
-    main_tags = TAG_PATTERN.findall(xml_str)
-    for main_tag in main_tags:
-        # Add formatted tag
-        json_str +=  __replace_tag(main_tag)
+    # Find root tag
+    main_tag = TAG_PATTERN.fullmatch(xml_str)
+    main_tag = (main_tag.group(1), main_tag.group(2))
+    # Format root tag
+    json_str +=  __replace_tag(main_tag)
 
     # (Add closing bracket and) return JSON as a string 
     return json_str + '\n}'
