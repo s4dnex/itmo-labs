@@ -3,7 +3,7 @@
 import re
 from typing import Any, Dict, List
 
-# Formal Grammar
+# BNF
 CHAR = r'.'
 WHITESPACE = r'\s'
 NAME = r'[a-zA-Z][a-zA-Z0-9_]*'
