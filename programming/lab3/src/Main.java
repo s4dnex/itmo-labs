@@ -6,13 +6,14 @@ import roads.Road;
 import transport.Car;
 import adventure.Adventure;
 import characters.Adventurer;
-import characters.Person;
+import characters.He;
+import characters.Character;
 import containers.FoodContainer;
 import containers.Color;
 
 public class Main {
     public static void main(String[] args) {
-        Person he = new Person("He");
+        He he = new He();
         Adventurer adventurer1 = new Adventurer("Adventurer #1");
         Adventurer adventurer2 = new Adventurer("Adventurer #2");
 

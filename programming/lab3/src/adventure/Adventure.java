@@ -3,7 +3,8 @@ package adventure;
 import java.util.ArrayList;
 
 import characters.Adventurer;
-import characters.Person;
+import characters.He;
+import characters.Character;
 import containers.Container;
 import exceptions.EndOfRoadException;
 import exceptions.NoFoodInHandException;
@@ -14,22 +15,22 @@ import transport.Transport;
 
 @SuppressWarnings("rawtypes")
 public class Adventure {
-    protected ArrayList<Person> persons;
+    protected ArrayList<Character> persons;
     protected Road road;
     protected Transport transport;
     protected Container container;
 
-    public Adventure(Person persons, Road road, Transport transport, Container container) {
-        this.persons = new ArrayList<Person>();
+    public Adventure(Character persons, Road road, Transport transport, Container container) {
+        this.persons = new ArrayList<Character>();
         this.persons.add(persons);
         this.road = road;
         this.transport = transport;
         this.container = container;
     }
 
-    public Adventure(Iterable<Person> persons, Road road, Transport transport, Container container) {
-        this.persons = new ArrayList<Person>();
-        for (Person person : persons) {
+    public Adventure(Iterable<Character> persons, Road road, Transport transport, Container container) {
+        this.persons = new ArrayList<Character>();
+        for (Character person : persons) {
             this.persons.add(person);
         }
         this.road = road;
@@ -38,14 +39,16 @@ public class Adventure {
     }
 
     public void start() {
-        road.reset();
+        if (!road.isRoadLeft())
+            road = Road.getRandomRoad();
 
-        for (Person person : persons) {
-            if (person instanceof Adventurer) continue;
+        for (Character person : persons) {
+            if (!(person instanceof He)) continue;
             try {
-                person.say();
-                person.hand.takeFrom(container);
-                person.eat();
+                He he = (He) person;
+                he.say();
+                he.hand.takeFrom(container);
+                he.eat();
             }
             catch (NoFoodInHandException e) {
                 System.out.println(e.getMessage());
@@ -63,7 +66,7 @@ public class Adventure {
                 System.out.printf("Current part of road is %s.\n", currentRoadPart);
                 transport.move(currentRoadType);
 
-                for (Person person : persons) {
+                for (Character person : persons) {
                     if (person instanceof Adventurer) {
                         ((Adventurer) person).think(currentRoadType);
                     }

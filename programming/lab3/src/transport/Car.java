@@ -35,7 +35,7 @@ public class Car extends Transport {
 
     @Override
     public String toString() {
-        return model + " from " + manufacturer;
+        return manufacturer + " " + model;
     }
 
     @Override

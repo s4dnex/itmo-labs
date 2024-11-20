@@ -2,6 +2,7 @@ package roads;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Random;
 
 import exceptions.EndOfRoadException;
 
@@ -26,6 +27,14 @@ public class Road {
         for (RoadPart part : road) {
             this.road.add(part);
         }
+    }
+
+    public static Road getRandomRoad() {
+        ArrayList<RoadPart> roadParts = new ArrayList<RoadPart>();
+        for (int i = 0; i < new Random().nextInt(10); i++) {
+            roadParts.add(RoadPart.getRandomRoadPart());
+        }
+        return new Road(roadParts);
     }
 
     public RoadPart getCurrentPart() {

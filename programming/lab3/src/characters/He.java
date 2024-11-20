@@ -1,23 +1,16 @@
 package characters;
 
-import java.util.Objects;
-
 import containers.Container;
 import exceptions.NoFoodInHandException;
 import food.Edible;
 
-public class Person {
-    protected String name;
+public class He extends Character implements Speaks {
     public Hand hand = new Hand();
 
-    public Person() {
-        this.name = "Unknown";
+    public He() {
+        super("He");
     }
-    
-    public Person(String name) {
-        this.name = name;
-    }
-    
+
     public void say() {
         System.out.printf("%s said something.\n", name);
     }
@@ -26,6 +19,7 @@ public class Person {
         System.out.printf("%s said: \"%s\".\n", name, words);
     }
     
+
     public void eat() throws NoFoodInHandException {
         if (hand.item != null && hand.item instanceof Edible)
             System.out.printf("%s ate %s.\n", name, hand.item.toString());
@@ -41,24 +35,5 @@ public class Person {
             item = container.getRandomItem();
             System.out.printf("%s took out %s from %s.\n", name, item.toString(), container.toString());
         }
-    }
-
-    @Override
-    public String toString() {
-        return name;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this.getClass() != obj.getClass()) 
-            return false;
-        
-        Person person = (Person) obj;
-        return this.name.equals(person.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
     }
 }

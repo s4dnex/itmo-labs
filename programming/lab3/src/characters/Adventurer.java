@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import roads.RoadType;
 
-public class Adventurer extends Person {
+public class Adventurer extends Character implements Thinkable {
     public Adventurer() {
         this.name = "Unknown adventurer";
     }
@@ -12,7 +12,6 @@ public class Adventurer extends Person {
     public Adventurer(String name) {
         super(name);
     }
-
 
     public void think(RoadType roadType) {
         if (roadType == RoadType.UPHILL) {
