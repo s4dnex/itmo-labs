@@ -1,21 +1,24 @@
 \documentclass{article}
 \usepackage[english,russian]{babel}
 \usepackage[a5paper, top=1cm, bottom=1.5cm, left=0.5cm, right=1.25cm]{geometry}
-\usepackage{amsmath,amssymb}
+\usepackage{amsmath,amssymb} % Математические формулы
 \usepackage{paracol} % Разбиение текста на колонки
 \usepackage{graphicx} % Для добавления иллюстраций
-\usepackage{tikz}
-\usepackage{wrapfig}
-\usetikzlibrary {angles, calc}
+\usepackage{tikz} % Для рисования фигур
+\usepackage{wrapfig} % Для текста вокруг иллюстрации
+\usetikzlibrary {angles, calc} % Дополнительные библиотеки для tikz
 
 \graphicspath{{./img/}} % Путь до картинок
 
 \columnratio{0.4,0.6} % Соотношение размеров колонок
 \setlength{\emergencystretch}{4em} % Максимальное расстояние между словами
-\setlength\parindent{2.5em}
-\pagestyle{empty}
+\setlength\parindent{2.5em} % Отступ абзаца
+\pagestyle{empty} % Стиль страницы без колонтитулов
 
 \begin{document}
+
+    % Title
+
     \begin{paracol}{2}
         \begin{column}
         \end{column}
@@ -25,6 +28,8 @@
             % \vspace{2em}
         \end{column}
     \end{paracol}
+
+    % Text
 
     \begin{paracol}{2}
         \begin{column}
@@ -201,55 +206,5 @@
 
     \end{paracol}
 
-% \section*{КНИГА III. ПРЕДЛОЖЕНИЕ IV. ТЕОРЕМА}
-
-% Если в круге две прямые, не проходящие через центр, пересекаются, они не делят друг друга пополам.
-
-% \bigskip
-
-% \noindent \textbf{Доказательство:}
-
-% Если одна из прямых проходит через центр, очевидно, она не может быть разделена пополам другой прямой, не проходящей через центр.
-
-% Но если ни одна из прямых \(AC\) или \(BD\) не проходит через центр, проведем \(EF\) из центра \(E\) к точке их пересечения.
-
-% \begin{center}
-% % \begin{tikzpicture}[scale=1.5]
-% %     % Circle
-% %     \draw[thick] (0,0) circle (2cm);
-
-% %     % Center point
-% %     \filldraw[black] (0,0) circle (1pt) node[below] {$E$};
-
-% %     % Lines AC and BD
-% %     \draw[thick] (-2,-1) -- (2,1) node[pos=0.9, above] {$AC$};
-% %     \draw[thick] (-1,2) -- (1,-2) node[pos=0.9, right] {$BD$};
-
-% %     % Line EF
-% %     \draw[dashed, thick] (0,0) -- (0.8,0.6) node[midway, above left] {$EF$};
-
-% %     % Intersection point
-% %     \filldraw[black] (0.8,0.6) circle (1pt) node[right] {$F$};
-
-% %     % Points on AC
-% %     \filldraw[black] (-2,-1) circle (1pt) node[below left] {$A$};
-% %     \filldraw[black] (2,1) circle (1pt) node[above right] {$C$};
-
-% %     % Points on BD
-% %     \filldraw[black] (-1,2) circle (1pt) node[above left] {$B$};
-% %     \filldraw[black] (1,-2) circle (1pt) node[below right] {$D$};
-% % \end{tikzpicture}
-% \end{center}
-
-% Если \(AC\) делится пополам, \(EF \perp AC\) (по предложению III.3). Аналогично, если \(BD\) делится пополам, \(EF \perp BD\) (по предложению III.3).
-
-% Следовательно, \(FCE = FDE\), что невозможно, так как часть равна целому.
-
-% \[
-% \therefore \text{Прямые \(AC\) и \(BD\) не делят друг друга пополам.}
-% \]
-
-% \bigskip
-% ч.т.д.
-
+    \clearpage
 \end{document}
