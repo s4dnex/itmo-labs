@@ -1,0 +1,21 @@
+\documentclass[12pt]{article}
+\usepackage[english,russian]{babel}
+\usepackage[a4paper, margin=0.5cm, bottom=1.5cm]{geometry}
+\usepackage{ragged2e} % Улучшенное выравнивание текста
+\usepackage{graphicx} % Для добавления иллюстраций
+\usepackage{tabularx} % Таблицы
+\usepackage{icomma} % Делает запятую в формулах более "интеллектуальной"
+\usepackage{lipsum} 
+\usepackage{paracol} % Разбиение текста на колонки
+\usepackage{amsmath} % Математические формулы
+\usepackage{fancyhdr} % Настройка стиля страницы
+
+\graphicspath{{./img/}} % Путь до картинок
+
+\columnratio{0.25,0.75} % Соотношение размеров колонок
+\setlength{\emergencystretch}{3em} % Максимальное расстояние между словами
+
+\begin{document}
+    \input{title.tex}
+    \input{article.tex}
+\end{document}

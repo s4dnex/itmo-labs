@@ -1,0 +1,255 @@
+\documentclass{article}
+\usepackage[english,russian]{babel}
+\usepackage[a5paper, top=1cm, bottom=1.5cm, left=0.5cm, right=1.25cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{paracol} % Разбиение текста на колонки
+\usepackage{graphicx} % Для добавления иллюстраций
+\usepackage{tikz}
+\usepackage{wrapfig}
+\usetikzlibrary {angles, calc}
+
+\graphicspath{{./img/}} % Путь до картинок
+
+\columnratio{0.4,0.6} % Соотношение размеров колонок
+\setlength{\emergencystretch}{4em} % Максимальное расстояние между словами
+\setlength\parindent{2.5em}
+\pagestyle{empty}
+
+\begin{document}
+    \begin{paracol}{2}
+        \begin{column}
+        \end{column}
+
+        \begin{column}
+            \noindent96\qquad КНИГА III ПРЕДЛ. IV. ТЕОРЕМА\hfill \\
+            % \vspace{2em}
+        \end{column}
+    \end{paracol}
+
+    \begin{paracol}{2}
+        \begin{column}
+            \begin{center}
+                \begin{tikzpicture}
+                    \coordinate [label=left:\tiny{$A$}] (A) at (-2.04,0.2);
+                    \coordinate [label=left:\tiny{$B$}] (B) at (-1.87,-0.84);
+                    \coordinate [label=right:\tiny{$C$}] (C) at (1.45,-1.45);
+                    \coordinate [label=right:\tiny{$D$}] (D) at (2.01,-0.4);
+                    \coordinate [label=left:\tiny{$F$}]  (F) at (0,0);
+                    \coordinate (G) at (-0.45,-2);
+                    \coordinate [label=below:\tiny{$E$}] (E) at (-0.23,-0.65);
+                    % \draw (F) -- (G);
+                    \draw pic [fill=blue,angle radius=0.4cm] {angle = D--E--F};
+                    \draw pic [fill=yellow,angle radius=0.4cm] {angle = C--E--D};
+                    \draw[black, dashed, ultra thick] (F) -- (E);
+                    \draw[black, ultra thick] (A) -- (C);
+                    \draw[orange, ultra thick] (B) -- (D);
+                    
+
+                    \draw[blue, ultra thick] (F) let
+                                \p1 = ($ (G) - (F) $)
+                                in
+                                circle ({veclen(\x1,\y1)});
+                \end{tikzpicture}
+            \end{center}
+        \end{column}
+
+        \begin{column}
+            \noindent\begin{minipage}[t][6em]{\linewidth}
+                \begin{wrapfigure}{l}{0.2\linewidth}
+                    \includegraphics[width=1.7cm]{letter-E.png}
+                \end{wrapfigure}
+                \textit{\\ сли в круге две прямые, не проходящие через центр, пересекаются, они не делят друг друга пополам.}
+            \end{minipage}
+            
+            \vspace{1em}
+            \par Если одна из прямых проходит через центр, очевидно, она ее не может рассекать пополам другая прямая, не проходящая через центр.
+            \par Но если ни одна из прямых 
+            \begin{tikzpicture}
+                \draw[black, ultra thick] (0,0) -- (1,0);
+                \node[above] at (0,0) {{\tiny$A$}};
+                \node[above] at (1,0) {{\tiny$C$}};
+            \end{tikzpicture} 
+            или
+            \begin{tikzpicture}
+                \draw[orange, ultra thick] (0,0) -- (1,0);
+                \node[above] at (0,0) {{\tiny$B$}};
+                \node[above] at (1,0) {{\tiny$D$}};
+            \end{tikzpicture}
+            не проходит через центр, проведем 
+            \begin{tikzpicture}
+                \draw[black,dashed, ultra thick] (0,0) -- (1,0);
+                \node[above] at (0,0) {{\tiny$E$}};
+                \node[above] at (1,0) {{\tiny$F$}};
+            \end{tikzpicture}
+            из центра к точке их пересечения.\\
+            
+            \noindent\begin{minipage}[t][6em]{\linewidth}
+                \begin{center}
+                    Если
+                    \begin{tikzpicture}
+                        \draw[black, ultra thick] (0,0) -- (1,0);
+                        \node[above] at (0,0) {{\tiny$A$}};
+                        \node[above] at (1,0) {{\tiny$C$}};
+                    \end{tikzpicture}
+                    делится пополам,\\
+                    \begin{tikzpicture}
+                        \draw[black, dashed, ultra thick] (0,0) -- (1,0);
+                        \node[above] at (0,0) {{\tiny$E$}};
+                        \node[above] at (1,0) {{\tiny$F$}};
+                    \end{tikzpicture}
+                    $\bot$ ей (пр. III.$_3$)
+                    \[
+                    \begin{array}{c@{\hskip 1em}c@{\hskip 1em}c}
+                        \therefore &
+                        \begin{tikzpicture}[baseline]
+                            \coordinate [label=below:\tiny{$C$}] (C) at (0.53,-0.25);
+                            \coordinate (D) at (0.27,0.03);
+                            \coordinate [label=left:\tiny{$F$}]  (F) at (0.23,0.65);
+                            \coordinate [label=left:\tiny{$E$}] (E) at (0,0);
+                            \draw pic [fill=blue] {angle = D--E--F};
+                            \draw pic [fill=yellow] {angle = C--E--D};
+                        \end{tikzpicture} = &
+                        \begin{tikzpicture}[baseline]
+                            \coordinate (A) at (-0.5, 0);
+                            \coordinate (B) at (0, 0);
+                            \coordinate (C) at (0, 0.5);
+                            \draw [black, thick] (A) -- (B);
+                            \draw [black, thick] (B) -- (C);
+                            \draw pic [draw, black, ultra thick] {angle = C--B--A};
+                        \end{tikzpicture}
+                    \end{array}
+                    \]
+                    и если
+                    \begin{tikzpicture}
+                        \draw[orange, ultra thick] (0,0) -- (1,0);
+                        \node[above] at (0,0) {{\tiny$B$}};
+                        \node[above] at (1,0) {{\tiny$D$}};
+                    \end{tikzpicture}
+                    делится пополам,\\
+                    \begin{tikzpicture}
+                        \draw[black, dashed, ultra thick] (0,0) -- (1,0);
+                        \node[above] at (0,0) {{\tiny$E$}};
+                        \node[above] at (1,0) {{\tiny$F$}};
+                    \end{tikzpicture}
+                    $\bot$
+                    \begin{tikzpicture}
+                        \draw[orange, ultra thick] (0,0) -- (1,0);
+                        \node[above] at (0,0) {{\tiny$B$}};
+                        \node[above] at (1,0) {{\tiny$D$}};
+                    \end{tikzpicture} (пр. III.$_3$)
+                    \[
+                    \begin{array}{c@{\hskip 1em}c@{\hskip 1em}c}
+                        \therefore &
+                        \begin{tikzpicture}[baseline]
+                            \coordinate (C) at (0.53,-0.25);
+                            \coordinate [label=right:\tiny{$D$}] (D) at (0.36,0.04);
+                            \coordinate [label=left:\tiny{$F$}]  (F) at (0.23,0.65);
+                            \coordinate [label=left:\tiny{$E$}] (E) at (0,0);
+                            \draw pic [fill=blue] {angle = D--E--F};
+                            % \draw pic [fill=yellow] {angle = C--E--D};
+                        \end{tikzpicture} = &
+                        \begin{tikzpicture}[baseline]
+                            \coordinate (A) at (-0.5, 0);
+                            \coordinate (B) at (0, 0);
+                            \coordinate (C) at (0, 0.5);
+                            \draw [black, thick] (A) -- (B);
+                            \draw [black, thick] (B) -- (C);
+                            \draw pic [draw, black, ultra thick] {angle = C--B--A};
+                        \end{tikzpicture};
+                    \end{array}
+                    \]
+                    \[
+                    \begin{array}{c@{\hskip 1em}c@{\hskip 1em}c}
+                        \text{и } \therefore &
+                        \begin{tikzpicture}[baseline]
+                            \coordinate (C) at (0.53,-0.25);
+                            \coordinate [label=right:\tiny{$D$}] (D) at (0.36,0.04);
+                            \coordinate [label=left:\tiny{$F$}]  (F) at (0.23,0.65);
+                            \coordinate [label=left:\tiny{$E$}] (E) at (0,0);
+                            \draw pic [fill=blue] {angle = D--E--F};
+                            % \draw pic [fill=yellow] {angle = C--E--D};
+                        \end{tikzpicture} = &
+                        \begin{tikzpicture}[baseline]
+                            \coordinate [label=below:\tiny{$C$}] (C) at (0.53,-0.25);
+                            \coordinate (D) at (0.27,0.03);
+                            \coordinate [label=left:\tiny{$F$}]  (F) at (0.23,0.65);
+                            \coordinate [label=left:\tiny{$E$}] (E) at (0,0);
+                            \draw pic [fill=blue] {angle = D--E--F};
+                            \draw pic [fill=yellow] {angle = C--E--D};
+                        \end{tikzpicture};
+                    \end{array}
+                    \]
+                    часть равна целому, что невозможно.\\
+                    \vspace{1em}
+                    $\therefore$
+                    \begin{tikzpicture}
+                        \draw[black, ultra thick] (0,0) -- (1,0);
+                        \node[above] at (0,0) {{\tiny$A$}};
+                        \node[above] at (1,0) {{\tiny$C$}};
+                    \end{tikzpicture}
+                    и
+                    \begin{tikzpicture}
+                        \draw[orange, ultra thick] (0,0) -- (1,0);
+                        \node[above] at (0,0) {{\tiny$B$}};
+                        \node[above] at (1,0) {{\tiny$D$}};
+                    \end{tikzpicture}
+                    не делят друг друга пополам.
+                    \rightline{ч.т.д.}
+                \end{center}
+            \end{minipage}
+        \end{column}
+
+    \end{paracol}
+
+% \section*{КНИГА III. ПРЕДЛОЖЕНИЕ IV. ТЕОРЕМА}
+
+% Если в круге две прямые, не проходящие через центр, пересекаются, они не делят друг друга пополам.
+
+% \bigskip
+
+% \noindent \textbf{Доказательство:}
+
+% Если одна из прямых проходит через центр, очевидно, она не может быть разделена пополам другой прямой, не проходящей через центр.
+
+% Но если ни одна из прямых \(AC\) или \(BD\) не проходит через центр, проведем \(EF\) из центра \(E\) к точке их пересечения.
+
+% \begin{center}
+% % \begin{tikzpicture}[scale=1.5]
+% %     % Circle
+% %     \draw[thick] (0,0) circle (2cm);
+
+% %     % Center point
+% %     \filldraw[black] (0,0) circle (1pt) node[below] {$E$};
+
+% %     % Lines AC and BD
+% %     \draw[thick] (-2,-1) -- (2,1) node[pos=0.9, above] {$AC$};
+% %     \draw[thick] (-1,2) -- (1,-2) node[pos=0.9, right] {$BD$};
+
+% %     % Line EF
+% %     \draw[dashed, thick] (0,0) -- (0.8,0.6) node[midway, above left] {$EF$};
+
+% %     % Intersection point
+% %     \filldraw[black] (0.8,0.6) circle (1pt) node[right] {$F$};
+
+% %     % Points on AC
+% %     \filldraw[black] (-2,-1) circle (1pt) node[below left] {$A$};
+% %     \filldraw[black] (2,1) circle (1pt) node[above right] {$C$};
+
+% %     % Points on BD
+% %     \filldraw[black] (-1,2) circle (1pt) node[above left] {$B$};
+% %     \filldraw[black] (1,-2) circle (1pt) node[below right] {$D$};
+% % \end{tikzpicture}
+% \end{center}
+
+% Если \(AC\) делится пополам, \(EF \perp AC\) (по предложению III.3). Аналогично, если \(BD\) делится пополам, \(EF \perp BD\) (по предложению III.3).
+
+% Следовательно, \(FCE = FDE\), что невозможно, так как часть равна целому.
+
+% \[
+% \therefore \text{Прямые \(AC\) и \(BD\) не делят друг друга пополам.}
+% \]
+
+% \bigskip
+% ч.т.д.
+
+\end{document}
