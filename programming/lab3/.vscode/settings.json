@@ -1,5 +1,0 @@
-{
-    "plantuml.includepaths": ["docs/diagram"],
-    "plantuml.diagramsRoot": "docs/diagram",
-    "plantuml.exportOutDir": "img"
-}
