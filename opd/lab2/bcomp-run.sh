@@ -1,1 +1,1 @@
-java -jar -Dmode=dual -Dcode=./src/program.asm ./lib/bcomp-ng.jar
+java -jar -Dmode=dual -Dcode=./src/program_optimized.asm ./lib/bcomp-ng.jar
