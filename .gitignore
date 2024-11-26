@@ -23,7 +23,11 @@
 hs_err_pid*
 replay_pid*
 
-Tests.java
+# VS Code
+.vscode
+
+# IntelliJ IDEA
+.idea
 
 # Python
 __pycache__
