@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Random;
 
 import food.Flavor;
 import food.Icecream;
@@ -33,7 +34,7 @@ public class Main {
             foodContainer
         );
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < new Random().nextInt(1, 5); i++) {
             adventure.start();
             System.out.println();          
         }

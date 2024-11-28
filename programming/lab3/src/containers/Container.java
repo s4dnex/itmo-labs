@@ -35,11 +35,16 @@ public abstract class Container<T> {
         this.color = color;
     }
 
-    public T getRandomItem() {
-        int index = new Random().nextInt(items.size());
-        T item = items.get(index);
-        items.remove(index);
-        return item;
+    public T getRandomItem() throws IndexOutOfBoundsException{
+        try {
+            int index = new Random().nextInt(items.size());
+            T item = items.get(index);
+            items.remove(index);
+            return item;    
+        }
+        catch (Exception e) {
+            throw new IndexOutOfBoundsException();
+        }
     }
 
     public void add(T item) {
