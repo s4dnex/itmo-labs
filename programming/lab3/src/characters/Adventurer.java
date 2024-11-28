@@ -2,9 +2,10 @@ package characters;
 
 import java.util.Objects;
 
-import roads.RoadType;
+import other.Thinkable;
 
-public class Adventurer extends Character implements Thinkable {
+
+public class Adventurer extends Character implements CanThink {
     public Adventurer() {
         this.name = "Unknown adventurer";
     }
@@ -13,10 +14,9 @@ public class Adventurer extends Character implements Thinkable {
         super(name);
     }
 
-    public void think(RoadType roadType) {
-        if (roadType == RoadType.UPHILL) {
-            System.out.println(name + " thinks that he/she is on the edge of the world now.");
-        }
+    @Override
+    public void thinkAbout(Thinkable obj) {
+        System.out.printf("%s thinks that %s.\n", name, obj.getThought());
     }
 
     @Override

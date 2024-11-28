@@ -7,7 +7,6 @@ import transport.Car;
 import adventure.Adventure;
 import characters.Adventurer;
 import characters.He;
-import characters.Character;
 import containers.FoodContainer;
 import containers.Color;
 

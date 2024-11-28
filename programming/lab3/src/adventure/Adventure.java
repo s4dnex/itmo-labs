@@ -2,12 +2,14 @@ package adventure;
 
 import java.util.ArrayList;
 
-import characters.Adventurer;
-import characters.He;
+import characters.CanEat;
+import characters.CanSay;
+import characters.CanThink;
 import characters.Character;
+import characters.HasHand;
 import containers.Container;
 import exceptions.EndOfRoadException;
-import exceptions.NoFoodInHandException;
+import exceptions.NoFoodAvailableException;
 import roads.Road;
 import roads.RoadPart;
 import roads.RoadType;
@@ -43,19 +45,21 @@ public class Adventure {
             road = Road.getRandomRoad();
 
         for (Character person : persons) {
-            if (!(person instanceof He)) continue;
-            try {
-                He he = (He) person;
-                he.say();
-                he.hand.takeFrom(container);
-                he.eat();
+            if (person instanceof CanSay) {
+                ((CanSay) person).say();
             }
-            catch (NoFoodInHandException e) {
-                System.out.println(e.getMessage());
-            }
-            catch (IllegalArgumentException e) {
-                System.out.println(person + " could not take an item from " + container + " because it was empty.");
-            }
+            
+            if (person instanceof HasHand && person instanceof CanEat)
+                try {
+                    ((HasHand) person).takeFrom(container);
+                    ((CanEat) person).eat();
+                }
+                catch (NoFoodAvailableException e) {
+                    System.out.println(e.getMessage());
+                }
+                catch (IllegalArgumentException e) {
+                    System.out.println(person + " could not take an item from " + container + " because it was empty.");
+                }
         }
 
         while (true) {
@@ -67,8 +71,8 @@ public class Adventure {
                 transport.move(currentRoadType);
 
                 for (Character person : persons) {
-                    if (person instanceof Adventurer) {
-                        ((Adventurer) person).think(currentRoadType);
+                    if (person instanceof CanThink) {
+                        ((CanThink) person).thinkAbout(currentRoadType);
                     }
                 }
             }

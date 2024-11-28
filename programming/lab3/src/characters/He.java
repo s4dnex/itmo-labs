@@ -1,11 +1,11 @@
 package characters;
 
 import containers.Container;
-import exceptions.NoFoodInHandException;
+import exceptions.NoFoodAvailableException;
 import food.Edible;
 
-public class He extends Character implements Speaks {
-    public Hand hand = new Hand();
+public class He extends Character implements CanSay, HasHand, CanEat {
+    protected Hand hand = new Hand();
 
     public He() {
         super("He");
@@ -19,21 +19,17 @@ public class He extends Character implements Speaks {
         System.out.printf("%s said: \"%s\".\n", name, words);
     }
     
+    @Override
+    @SuppressWarnings("rawtypes")
+    public void takeFrom(Container container) throws IllegalArgumentException {
+        hand.takeFrom(container);
+        System.out.printf("%s took out %s from %s.\n", name, hand.item.toString(), container.toString());
+    }
 
-    public void eat() throws NoFoodInHandException {
+    public void eat() throws NoFoodAvailableException {
         if (hand.item != null && hand.item instanceof Edible)
             System.out.printf("%s ate %s.\n", name, hand.item.toString());
         else
-            throw new NoFoodInHandException(name + " does not have any food in his/her hand.", hand.item);
-    }
-
-    public class Hand {
-        Object item;
-
-        @SuppressWarnings("rawtypes")
-        public void takeFrom(Container container) {
-            item = container.getRandomItem();
-            System.out.printf("%s took out %s from %s.\n", name, item.toString(), container.toString());
-        }
+            throw new NoFoodAvailableException(name + " does not have any food in his/her hand.", hand.item);
     }
 }

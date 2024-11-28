@@ -1,6 +1,6 @@
 package characters;
 
-public interface Speaks {
+public interface CanSay {
     public void say();
     public void say(String words);
 }
