@@ -1,6 +1,7 @@
 package containers;
 
 import food.Edible;
+import other.Color;
 
 public class FoodContainer extends Container<Edible> {
     public FoodContainer() {

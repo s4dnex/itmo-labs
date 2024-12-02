@@ -1,5 +1,7 @@
 package characters;
 
+import java.util.Objects;
+
 import containers.Container;
 import exceptions.NoFoodAvailableException;
 import food.Edible;
@@ -31,5 +33,20 @@ public class He extends Character implements CanSay, HasHand, CanEat {
             System.out.printf("%s ate %s.\n", name, hand.item.toString());
         else
             throw new NoFoodAvailableException(name + " does not have any food in his/her hand.", hand.item);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this.getClass() != obj.getClass()) 
+            return false;
+        
+        He he = (He) obj;
+        return this.name.equals(he.name) &&
+                this.hand.equals(he.hand);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, hand);
     }
 }

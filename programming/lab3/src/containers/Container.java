@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
 
+import other.Color;
+
 public abstract class Container<T> {
     protected ArrayList<T> items;
     protected Color color;

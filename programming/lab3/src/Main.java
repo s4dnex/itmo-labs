@@ -3,13 +3,13 @@ import java.util.Random;
 
 import food.Flavor;
 import food.Icecream;
+import other.Color;
 import roads.Road;
 import transport.Car;
 import adventure.Adventure;
 import characters.Adventurer;
 import characters.He;
 import containers.FoodContainer;
-import containers.Color;
 
 public class Main {
     public static void main(String[] args) {
@@ -36,7 +36,8 @@ public class Main {
 
         for (int i = 0; i < new Random().nextInt(1, 5); i++) {
             adventure.start();
-            System.out.println();          
+            adventure.updateRoad();
+            System.out.println();         
         }
     }
 }

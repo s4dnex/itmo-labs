@@ -1,6 +1,7 @@
 package adventure;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import characters.CanEat;
 import characters.CanSay;
@@ -39,9 +40,6 @@ public class Adventure {
     }
 
     public void start() {
-        if (!road.isRoadLeft())
-            road = Road.getRandomRoad();
-
         for (Character person : persons) {
             if (person instanceof CanSay) {
                 ((CanSay) person).say();
@@ -78,5 +76,36 @@ public class Adventure {
                 break;
             }
         }
+    }
+
+    public void updateRoad() {
+        road = Road.getRandomRoad();
+    }
+
+    public void updateRoad(Road road) {
+        this.road = road;
+    }
+
+    @Override
+    public String toString() {
+        
+        return "Adventure with " + (persons) + " on road " + road + " with transport " + transport + " and container " + container;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this.getClass() != obj.getClass()) 
+            return false;
+        
+        Adventure adventure = (Adventure) obj;
+        return this.persons.equals(adventure.persons) && 
+                this.road.equals(adventure.road) && 
+                this.transport.equals(adventure.transport) && 
+                this.container.equals(adventure.container);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(persons, road, transport, container);
     }
 }
