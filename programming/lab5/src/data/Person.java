@@ -1,6 +1,8 @@
 package data;
 
-public class Person {
+import utils.Formatter;
+
+public class Person implements Comparable<Person> {
     private String name; // != null, != empty
     private float weight; // > 0
     private EyeColor eyeColor; 
@@ -9,12 +11,12 @@ public class Person {
 
     // CONSTRUCTORS
 
-    public Person(String name, float weight, EyeColor eyeColor, HairColor hairColor, Location location) {
-        setName(name);
-        setWeight(weight);
-        setEyeColor(eyeColor);
-        setHairColor(hairColor);
-        setLocation(location);
+    public Person(Person.Builder builder) {
+        this.name = builder.name;
+        this.weight = builder.weight;
+        this.eyeColor = builder.eyeColor;
+        this.hairColor = builder.hairColor;
+        this.location = builder.location;
     }
 
     // GETTERS
@@ -39,37 +41,122 @@ public class Person {
         return location;
     }
 
-    // SETTERS
+    // METHODS
 
-    protected void setName(String name) {
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Name cannot be null or empty");
-        }
-        this.name = name;
+    public static Response validateName(String name) {
+        if (name == null || name.isBlank())
+            return new Response(false, "Name can't be null or empty");
+        return new Response(true);
     }
 
-    protected void setWeight(float weight) {
-        if (weight <= 0) {
-            throw new IllegalArgumentException("Weight must be greater than 0");
-        }
-        this.weight = weight;
+    public static Response validateWeight(float weight) {
+        if (weight <= 0)
+            return new Response(false, "Weight must be greater than 0");
+        return new Response(true);
     }
 
-    protected void setEyeColor(EyeColor eyeColor) {   
-        this.eyeColor = eyeColor;
+    public static Response validateEyeColor(EyeColor eyeColor) {   
+        return new Response(true);
     }
 
-    protected void setHairColor(HairColor hairColor) {
-        if (hairColor == null) {
-            throw new IllegalArgumentException("Hair color cannot be null");
-        }
-        this.hairColor = hairColor;
+    public static Response validateHairColor(HairColor hairColor) {
+        if (hairColor == null)
+            return new Response(false, "Hair color can't be null");
+        return new Response(true);
     }
 
-    protected void setLocation(Location location) {
-        if (location == null) {
-            throw new IllegalArgumentException("Location cannot be null");
+    public static Response validateLocation(Location location) {
+        if (location == null)
+            return new Response(false, "Location can't be null");
+        return new Response(true);
+    }
+
+    @Override
+    public int compareTo(Person person) {
+        return name.compareTo(person.getName());
+    }
+
+    @Override
+    public String toString() {
+        String indent = Formatter.getIndentation(++Formatter.STRING_INDENTATION_COUNT);
+
+        String result = "Person {\n" +
+                indent + " name: " + name + "\n" +
+                indent + " weight: " + weight + "\n" +
+                indent + " eyeColor: " + eyeColor + "\n" +
+                indent + " hairColor: " + hairColor + "\n" +
+                indent + " location: " + location + "\n";
+
+        indent = Formatter.getIndentation(--Formatter.STRING_INDENTATION_COUNT);
+        result += indent + "}";
+        
+        return result;
+    }
+
+    // INNER CLASSES
+
+    public static class Builder {
+        private String name;
+        private float weight;
+        private EyeColor eyeColor;
+        private HairColor hairColor;
+        private Location location;
+
+        // METHODS
+
+        public Builder setName(String name) {
+            Response response = validateName(name);
+            if (response.getStatus()) {
+                this.name = name;
+                return this;
+            }
+            else throw new IllegalArgumentException(response.getMessage());
         }
-        this.location = location;
+
+        public Builder setWeight(float weight) {
+            Response response = validateWeight(weight);
+            if (response.getStatus()) {
+                this.weight = weight;
+                return this;
+            }
+            else throw new IllegalArgumentException(response.getMessage());
+        }
+
+        public Builder setEyeColor(EyeColor eyeColor) {
+            Response response = validateEyeColor(eyeColor);
+            if (response.getStatus()) {
+                this.eyeColor = eyeColor;
+                return this;
+            }
+            else throw new IllegalArgumentException(response.getMessage());
+        }
+
+        public Builder setHairColor(HairColor hairColor) {
+            Response response = validateHairColor(hairColor);
+            if (response.getStatus()) {
+                this.hairColor = hairColor;
+                return this;
+            }
+            else throw new IllegalArgumentException(response.getMessage());
+        }
+
+        public Builder setLocation(Location location) {
+            Response response = validateLocation(location);
+            if (response.getStatus()) {
+                this.location = location;
+                return this;
+            }
+            else throw new IllegalArgumentException(response.getMessage());
+        }
+
+        public Person build() {
+            if (validateName(name).getStatus() && 
+                validateWeight(weight).getStatus() &&
+                validateHairColor(hairColor).getStatus() && 
+                validateLocation(location).getStatus()
+            )
+                return new Person(this);
+            else throw new IllegalArgumentException("Invalid Person parameters");
+        }
     }
 }

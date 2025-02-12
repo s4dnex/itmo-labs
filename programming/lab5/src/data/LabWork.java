@@ -2,7 +2,9 @@ package data;
 
 import java.time.LocalDateTime;
 
-public class LabWork {
+import utils.Formatter;
+
+public class LabWork implements Comparable<LabWork> {
     private static long lastId = 0;
     private Long id; // != null, > 0, unique, auto
     private String name; // != null, != empty
@@ -14,16 +16,15 @@ public class LabWork {
 
     // CONSTRUCTORS
 
-    public LabWork(String name, Coordinates coordinates, Long minimalPoint, Difficulty difficulty, Person author) {
-        setName(name);
-        setCoordinates(coordinates);
-        setMinimalPoint(minimalPoint);
-        setDifficulty(difficulty);
-        setAuthor(author);
+    public LabWork(LabWork.Builder builder) {
+        this.name = builder.name;
+        this.coordinates = builder.coordinates;
+        this.minimalPoint = builder.minimalPoint;
+        this.difficulty = builder.difficulty;
+        this.author = builder.author;
 
-        // If everything above is OK
-        setId();
-        setCreationDate();
+        this.id = ++lastId;
+        this.creationDate = LocalDateTime.now();
     }
 
     // GETTERS
@@ -56,45 +57,129 @@ public class LabWork {
         return author;
     }
 
-    // SETTERS
+    // METHODS
 
-    private void setId() {
-        this.id = ++lastId;
+    public static Response validateName(String name) {
+        if (name == null || name.isBlank())
+            return new Response(false, "Name cannot be null or empty");
+        return new Response(true);
     }
 
-    protected void setName(String name) {
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Name cannot be null or empty");
+    public static Response validateCoordinates(Coordinates coordinates) {
+        if (coordinates == null)
+            return new Response(false, "Coordinates cannot be null");
+        return new Response(true);
+    }
+
+    public static Response validateMinimalPoint(Long minimalPoint) {
+        if (minimalPoint != null && minimalPoint <= 0)
+            return new Response(false, "Minimal point must be greater than 0");
+        return new Response(true);
+    }
+
+    public static Response validateDifficulty(Difficulty difficulty) {
+        if (difficulty == null)
+            return new Response(false, "Difficulty cannot be null");
+        return new Response(true);
+    }
+
+    public static Response validateAuthor(Person author) {
+        return new Response(true);
+    }
+
+    @Override
+    public int compareTo(LabWork labWork) {
+        return this.difficulty == labWork.difficulty ?
+                this.minimalPoint.compareTo(labWork.minimalPoint) :
+                this.difficulty.compareTo(labWork.difficulty);
+
+    }
+
+    @Override
+    public String toString() {
+        String indent = Formatter.getIndentation(++Formatter.STRING_INDENTATION_COUNT);
+
+        String result = 
+                "LabWork {\n" +
+                indent + "id: " + id + "\n" +
+                indent + "name: " + name + "\n" +
+                indent + "coordinates: " + coordinates + "\n" +
+                indent + "creationDate: " + creationDate.format(Formatter.DATE_FORMAT) + "\n" +
+                indent + "minimalPoint: " + minimalPoint + "\n" +
+                indent + "difficulty: " + difficulty + "\n" +
+                indent + "author: " + author + "\n";
+
+        indent = Formatter.getIndentation(--Formatter.STRING_INDENTATION_COUNT);        
+        result += indent + "}";
+
+        return result;
+    }
+
+    // INNER CLASSES
+
+    public static class Builder {
+        private String name;
+        private Coordinates coordinates;
+        private Long minimalPoint;
+        private Difficulty difficulty;
+        private Person author;
+
+        // METHODS 
+
+        public Builder setName(String name) {
+            Response response = validateName(name);
+            if (response.getStatus()) {
+                this.name = name;
+                return this;
+            }
+            else throw new IllegalArgumentException(response.getMessage());
         }
-        this.name = name;
-    }
 
-    protected void setCoordinates(Coordinates coordinates) {
-        if (coordinates == null) {
-            throw new IllegalArgumentException("Coordinates cannot be null");
+        public Builder setCoordinates(Coordinates coordinates) {
+            Response response = validateCoordinates(coordinates); 
+            if (response.getStatus()) {
+                this.coordinates = coordinates;
+                return this;
+            }
+            else throw new IllegalArgumentException(response.getMessage());
         }
-        this.coordinates = coordinates;
-    }
 
-    private void setCreationDate() {
-        this.creationDate = LocalDateTime.now();
-    }
-
-    protected void setMinimalPoint(Long minimalPoint) {
-        if (minimalPoint != null && minimalPoint <= 0) {
-            throw new IllegalArgumentException("Minimal point must be greater than 0");
+        public Builder setMinimalPoint(Long minimalPoint) {
+            Response response = validateMinimalPoint(minimalPoint);
+            if (response.getStatus()) {
+                this.minimalPoint = minimalPoint;
+                return this;
+            }
+            else throw new IllegalArgumentException(response.getMessage());
         }
-        this.minimalPoint = minimalPoint;
-    }
 
-    protected void setDifficulty(Difficulty difficulty) {
-        if (difficulty == null) {
-            throw new IllegalArgumentException("Difficulty cannot be null");
+        public Builder setDifficulty(Difficulty difficulty) {
+            Response response = validateDifficulty(difficulty);
+            if (response.getStatus()) {
+                this.difficulty = difficulty;
+                return this;
+            }
+            else throw new IllegalArgumentException(response.getMessage());
         }
-        this.difficulty = difficulty;
-    }
 
-    protected void setAuthor(Person author) {
-        this.author = author;
+        public Builder setAuthor(Person author) {
+            Response response = validateAuthor(author);
+            if (response.getStatus()) {
+                this.author = author;
+                return this;
+            }
+            else throw new IllegalArgumentException(response.getMessage());
+        }
+
+        public LabWork build() {
+            if (validateName(name).getStatus() &&
+                validateCoordinates(coordinates).getStatus() &&
+                validateMinimalPoint(minimalPoint).getStatus() &&
+                validateDifficulty(difficulty).getStatus() &&
+                validateAuthor(author).getStatus()
+            )
+                return new LabWork(this);
+            throw new IllegalArgumentException("Invalid LabWork parameters");
+        }
     }
 }
