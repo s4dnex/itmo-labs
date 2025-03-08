@@ -63,18 +63,14 @@ public class Location {
 
     @Override
     public String toString() {
-        String indent = Formatter.getIndentation(++Formatter.STRING_INDENTATION_COUNT);
-
-        String result = "Location {\n" +
-               indent + " x: " + x + "\n" +
-               indent + " y: " + y + "\n" +
-               indent + " z: " + z + "\n" +
-               indent + " name: " + name + "\n";
-
-        indent = Formatter.getIndentation(--Formatter.STRING_INDENTATION_COUNT);
-        result += indent + "}";
-
-        return result;
+        return Formatter.getStringsWithIndent(
+            "Location {",
+            " x: " + x,
+            " y: " + y,
+            " z: " + z,
+            " name: " + name,
+            "}"
+        );
     }
 
     // INNER CLASSES

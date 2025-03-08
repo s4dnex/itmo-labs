@@ -1,17 +1,31 @@
 package utils;
 
 public class Console {
-    private InputHandler inputHandler;
-    private OutputHandler outputHandler;
+    private boolean isInteractiveMode;
+    private final InputHandler inputHandler;
+    private final OutputHandler outputHandler;
 
     // CONSTRUCTORS 
 
     public Console(InputHandler inputHandler, OutputHandler outputHandler) {
+        isInteractiveMode = true;
         this.inputHandler = inputHandler;
         this.outputHandler = outputHandler;
     }
 
     // METHODS
+    
+    public boolean isInteractiveMode() {
+        return isInteractiveMode;
+    }
+
+    public void setInteractiveMode() {
+        isInteractiveMode = true;
+    }
+
+    public void setScriptMode() {
+        isInteractiveMode = false;
+    }
 
     public void print(Object obj) {
         outputHandler.print(obj);
@@ -29,7 +43,7 @@ public class Console {
         return inputHandler.readln();
     }
 
-    public void close() {
+    public void closeIO() {
         inputHandler.close();
         outputHandler.close();
     }

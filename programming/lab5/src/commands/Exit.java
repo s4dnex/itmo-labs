@@ -25,7 +25,7 @@ public class Exit extends Command {
             throw new IllegalArgumentException("Unexpected arguments occurred");
 
 
-        console.close();
+        console.closeIO();
         System.exit(0);
     }
 }

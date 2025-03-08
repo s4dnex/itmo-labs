@@ -2,25 +2,22 @@ package commands;
 
 import utils.Collection;
 import utils.Console;
-import utils.DataBuilder;
 
-public class Add extends Command {
+public class SumOfMinimalPoint extends Command {
     private final Console console;
     private final Collection collection;
-    private final DataBuilder dataBuilder;
 
     // CONSTRUCTORS
-    
-    public Add(Console console, Collection collection, DataBuilder dataBuilder) {
+
+    public SumOfMinimalPoint(Console console, Collection collection) {
         super(
-            "add", 
+            "sum_of_minimal_point", 
             new String[0], 
-            "Add a new element to the collection"
+            "Print the sum of the minimal point of all elements in the collection"
         );
 
         this.console = console;
         this.collection = collection;
-        this.dataBuilder = dataBuilder;
     }
 
     // METHODS
@@ -30,11 +27,7 @@ public class Add extends Command {
         if (args.length != 0) 
             throw new IllegalArgumentException("Unexpected arguments occurred");
         
-        collection.add(
-            dataBuilder.buildLabWork()
-        );
-
-        if (console.isInteractiveMode())
-            console.println("Element has been added!");
+        console.println("Sum of the minimal points: " + collection.sumOfMinimalPoint());
     }
+
 }

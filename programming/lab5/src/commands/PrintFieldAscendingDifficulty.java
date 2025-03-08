@@ -1,22 +1,19 @@
 package commands;
 
-import java.util.ArrayList;
-
-import data.LabWork;
 import utils.Collection;
 import utils.Console;
 
-public class Show extends Command {
+public class PrintFieldAscendingDifficulty extends Command {
     private final Console console;
     private final Collection collection;
 
     // CONSTRUCTORS
 
-    public Show(Console console, Collection collection) {
+    public PrintFieldAscendingDifficulty(Console console, Collection collection) {
         super(
-            "show", 
+            "print_field_ascending_difficulty", 
             new String[0], 
-            "Show all elements of the collection"
+            "Print the 'difficulty' field of all elements in ascending order"
         );
 
         this.console = console;
@@ -29,16 +26,17 @@ public class Show extends Command {
     public void execute(String[] args) {
         if (args.length != 0) 
             throw new IllegalArgumentException("Unexpected arguments occurred");
+        
+        var fields = collection.getAscendingDifficulty();
 
-        ArrayList<LabWork> labWorks = collection.asArrayList();
-        if (labWorks.size() == 0) {
+        if (fields.isEmpty()) {
             console.println("Collection is empty!");
-            return;
         }
-
-        console.println("The collection contains " + labWorks.size() + " element(s):");
-        for (int i = 0; i < labWorks.size(); i++) {
-            console.println((i + 1) + ". " + labWorks.get(i));
+        else {
+            console.println("Difficulties in ascending order:");
+            for (var field : fields) {
+                console.println(field);
+            }
         }
     }
 }

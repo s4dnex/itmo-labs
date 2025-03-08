@@ -15,8 +15,9 @@ public class App {
         OutputHandler outputHandler = new SystemOutput();
         Console console = new Console(inputHandler, outputHandler);
         Invoker invoker = new Invoker(console, collection);
+
         while (true) {
-            System.out.print("> ");
+            console.print("> ");
             invoker.execute(console.readln());
         }
     }

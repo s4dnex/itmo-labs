@@ -27,16 +27,12 @@ public class Coordinates {
 
     @Override
     public String toString() {
-        String indent = Formatter.getIndentation(++Formatter.STRING_INDENTATION_COUNT);
-
-        String result = "Coordinates {\n" +
-                        indent + " x: " + x + "\n" +
-                        indent + " y: " + y + "\n";
-        
-        indent = Formatter.getIndentation(--Formatter.STRING_INDENTATION_COUNT);
-        result += indent + "}";
-        
-        return result;
+        return Formatter.getStringsWithIndent(
+            "Coordinates {",
+            "x: " + x,
+            "y: " + y,
+            "}"
+        );
     }
 
     // INNER CLASSES

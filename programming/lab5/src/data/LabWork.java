@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import utils.Formatter;
 
 public class LabWork implements Comparable<LabWork> {
-    private static long lastId = 0;
     private Long id; // != null, > 0, unique, auto
     private String name; // != null, != empty
     private Coordinates coordinates; // != null
@@ -23,7 +22,6 @@ public class LabWork implements Comparable<LabWork> {
         this.difficulty = builder.difficulty;
         this.author = builder.author;
 
-        this.id = ++lastId;
         this.creationDate = LocalDateTime.now();
     }
 
@@ -55,6 +53,10 @@ public class LabWork implements Comparable<LabWork> {
 
     public Person getAuthor() {
         return author;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     // METHODS
@@ -96,23 +98,18 @@ public class LabWork implements Comparable<LabWork> {
     }
 
     @Override
-    public String toString() {
-        String indent = Formatter.getIndentation(++Formatter.STRING_INDENTATION_COUNT);
-
-        String result = 
-                "LabWork {\n" +
-                indent + "id: " + id + "\n" +
-                indent + "name: " + name + "\n" +
-                indent + "coordinates: " + coordinates + "\n" +
-                indent + "creationDate: " + creationDate.format(Formatter.DATE_FORMAT) + "\n" +
-                indent + "minimalPoint: " + minimalPoint + "\n" +
-                indent + "difficulty: " + difficulty + "\n" +
-                indent + "author: " + author + "\n";
-
-        indent = Formatter.getIndentation(--Formatter.STRING_INDENTATION_COUNT);        
-        result += indent + "}";
-
-        return result;
+    public String toString() {      
+        return Formatter.getStringsWithIndent(
+            "LabWork {",
+            "id: " + id,
+            "name: " + name,
+            "coordinates: " + coordinates,
+            "creationDate: " + creationDate.format(Formatter.DATE_FORMAT),
+            "minimalPoint: " + minimalPoint,
+            "difficulty: " + difficulty,
+            "author: " + author,
+            "}"
+        );
     }
 
     // INNER CLASSES
@@ -124,7 +121,7 @@ public class LabWork implements Comparable<LabWork> {
         private Difficulty difficulty;
         private Person author;
 
-        // METHODS 
+        // METHODS
 
         public Builder setName(String name) {
             Response response = validateName(name);

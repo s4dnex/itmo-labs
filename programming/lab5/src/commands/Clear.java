@@ -2,25 +2,22 @@ package commands;
 
 import utils.Collection;
 import utils.Console;
-import utils.DataBuilder;
 
-public class Add extends Command {
+public class Clear extends Command {
     private final Console console;
     private final Collection collection;
-    private final DataBuilder dataBuilder;
 
     // CONSTRUCTORS
-    
-    public Add(Console console, Collection collection, DataBuilder dataBuilder) {
+
+    public Clear(Console console, Collection collection) {
         super(
-            "add", 
+            "clear", 
             new String[0], 
-            "Add a new element to the collection"
+            "Clear the collection"
         );
 
         this.console = console;
         this.collection = collection;
-        this.dataBuilder = dataBuilder;
     }
 
     // METHODS
@@ -30,11 +27,9 @@ public class Add extends Command {
         if (args.length != 0) 
             throw new IllegalArgumentException("Unexpected arguments occurred");
         
-        collection.add(
-            dataBuilder.buildLabWork()
-        );
-
+        collection.clear();
+        
         if (console.isInteractiveMode())
-            console.println("Element has been added!");
+            console.println("Collection has been cleared!");
     }
 }

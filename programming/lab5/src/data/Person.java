@@ -78,19 +78,15 @@ public class Person implements Comparable<Person> {
 
     @Override
     public String toString() {
-        String indent = Formatter.getIndentation(++Formatter.STRING_INDENTATION_COUNT);
-
-        String result = "Person {\n" +
-                indent + " name: " + name + "\n" +
-                indent + " weight: " + weight + "\n" +
-                indent + " eyeColor: " + eyeColor + "\n" +
-                indent + " hairColor: " + hairColor + "\n" +
-                indent + " location: " + location + "\n";
-
-        indent = Formatter.getIndentation(--Formatter.STRING_INDENTATION_COUNT);
-        result += indent + "}";
-        
-        return result;
+        return Formatter.getStringsWithIndent(
+            "Person {",
+            " name: " + name,
+            " weight: " + weight,
+            " eyeColor: " + eyeColor,
+            " hairColor: " + hairColor,
+            " location: " + location,
+            "}"            
+        );
     }
 
     // INNER CLASSES

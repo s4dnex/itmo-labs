@@ -11,6 +11,7 @@ import data.LabWork;
 import data.Person;
 
 public class Collection {
+    private static long lastId = 0L;
     private TreeSet<LabWork> labWorks;
     private final LocalDateTime creationDate; 
 
@@ -23,8 +24,12 @@ public class Collection {
 
     // GETTERS
 
+    public long getNextId() {
+        return ++lastId;
+    }
+
     public String getType() {
-        return labWorks.getClass().toString();
+        return labWorks.getClass().getSimpleName();
     }
 
     public LocalDateTime getCreationDate() {
@@ -41,13 +46,28 @@ public class Collection {
         return new ArrayList<LabWork>(labWorks);
     }
 
+    public boolean contains(long id) {
+        for (LabWork lw : labWorks) {
+            if (lw.getId().equals(id))
+                return true;
+        }
+        return false;
+    }
+
     public void add(LabWork labWork) {
-        labWorks.add(labWork);
+        if (labWork.getId() == null)
+            labWork.setId(getNextId());
+        
+        if (labWorks.add(labWork)) {
+            lastId = Math.max(labWork.getId(), lastId);
+        }
     }
 
     public void update(Long id, LabWork labWork) {
+        labWork.setId(id);
+        
         if (!labWorks.removeIf(lw -> lw.getId().equals(id)))
-            throw new IllegalArgumentException("No LabWork with such ID"); 
+            throw new IllegalArgumentException("No LabWork with such ID");
         labWorks.add(labWork);
     }
 
@@ -64,19 +84,31 @@ public class Collection {
         // TODO: Implement method
     }
 
-    public void addIfMax(LabWork labWork) {
-        LabWork maxLabWork = labWorks.getFirst();
-        for (LabWork lw : labWorks) {
-            if (lw.compareTo(maxLabWork) > 0)
-                maxLabWork = lw;
+    public boolean addIfMax(LabWork labWork) {
+        if (labWorks.size() == 0) {
+            labWorks.add(labWork);
+            return true;
         }
 
-        if (labWork.compareTo(maxLabWork) > 0)
+        LabWork maxLabWork = labWorks.last();
+        // for (LabWork lw : labWorks) {
+        //     if (lw.compareTo(maxLabWork) > 0)
+        //         maxLabWork = lw;
+        // }
+        
+        if (labWork.compareTo(maxLabWork) > 0) {
             labWorks.add(labWork);
+            return true;
+        }
+
+        return false;
     }
 
-    public void removeIfLower(LabWork labWork) {
-        labWorks.removeIf(lw -> lw.compareTo(labWork) < 0);
+    public long removeLower(LabWork labWork) {
+        return labWorks.stream()
+            .filter(lw -> lw.compareTo(labWork) < 0)
+            .peek(lw -> labWorks.remove(lw))
+            .count();
     }
 
     public long sumOfMinimalPoint() {
@@ -88,7 +120,7 @@ public class Collection {
     }
 
     public List<Difficulty> getAscendingDifficulty() {
-        ArrayList<Difficulty> difficulties = new ArrayList<Difficulty>();
+        List<Difficulty> difficulties = new ArrayList<Difficulty>();
         for (LabWork lw : labWorks) {
             difficulties.add(lw.getDifficulty());
         }
@@ -97,7 +129,7 @@ public class Collection {
     }
 
     public List<Person> getDescendingAuthor() {
-        ArrayList<Person> authors = new ArrayList<Person>();
+        List<Person> authors = new ArrayList<Person>();
         for (LabWork lw : labWorks) {
             authors.add(lw.getAuthor());
         }

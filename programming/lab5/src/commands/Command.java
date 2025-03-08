@@ -35,4 +35,9 @@ public abstract class Command implements Comparable<Command> {
     public int compareTo(Command command) {
         return name.compareTo(command.getName());
     }
+
+    @Override
+    public String toString() {
+        return name + " " + String.join(" ", args);
+    }
 }

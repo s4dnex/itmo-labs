@@ -4,18 +4,18 @@ import utils.Collection;
 import utils.Console;
 import utils.DataBuilder;
 
-public class Add extends Command {
+public class AddIfMax extends Command {
     private final Console console;
     private final Collection collection;
     private final DataBuilder dataBuilder;
-
-    // CONSTRUCTORS
     
-    public Add(Console console, Collection collection, DataBuilder dataBuilder) {
+    // CONSTRUCTORS
+
+    public AddIfMax(Console console, Collection collection, DataBuilder dataBuilder) {
         super(
-            "add", 
+            "add_if_max", 
             new String[0], 
-            "Add a new element to the collection"
+            "Add a new element to the collection if its value is greater than the greatest element of this collection"
         );
 
         this.console = console;
@@ -30,11 +30,11 @@ public class Add extends Command {
         if (args.length != 0) 
             throw new IllegalArgumentException("Unexpected arguments occurred");
         
-        collection.add(
-            dataBuilder.buildLabWork()
-        );
-
         if (console.isInteractiveMode())
-            console.println("Element has been added!");
+            if (collection.addIfMax(dataBuilder.buildLabWork()))
+                console.println("Element has been added!");
+            else
+                console.println("Element has NOT been added!");
     }
+
 }
