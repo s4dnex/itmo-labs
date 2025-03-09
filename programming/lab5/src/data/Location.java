@@ -1,6 +1,6 @@
 package data;
 
-import utils.Formatter;
+import json.JsonHandler;
 
 public class Location {
     private Double x; // != null
@@ -37,40 +37,33 @@ public class Location {
 
     // METHODS
 
-    public static Response validateX(Double x) {
+    public static boolean validateX(Double x) {
         if (x == null)
-            return new Response(false, "X can't be null");
-        return new Response(true);
+            return false;
+        return true;
     }
 
-    public static Response validateY(Double y) {
+    public static boolean validateY(Double y) {
         if (y == null)
-            return new Response(false, "Y can't be null");
-        return new Response(true);
+            return false;
+        return true;
     }
 
-    public static Response validateZ(Double z) {
+    public static boolean validateZ(Double z) {
         if (z == null)
-            return new Response(false, "Z can't be null");
-        return new Response(true);
+            return false;
+        return true;
     }
 
-    public static Response validateName(String name) {
+    public static boolean validateName(String name) {
         if (name == null || name.isBlank())
-            return new Response(false, "Name can't be null or empty");
-        return new Response(true);
+            return false;
+        return true;
     }
 
     @Override
     public String toString() {
-        return Formatter.getStringsWithIndent(
-            "Location {",
-            " x: " + x,
-            " y: " + y,
-            " z: " + z,
-            " name: " + name,
-            "}"
-        );
+        return JsonHandler.getGson().toJson(this);
     }
 
     // INNER CLASSES
@@ -82,50 +75,42 @@ public class Location {
         private String name;
 
         public Builder setX(Double x) {
-            Response response = validateX(x);
-            if (response.getStatus()) {
+            if (validateX(x)) {
                 this.x = x;
                 return this;
             }
-            else
-                throw new IllegalArgumentException(response.getMessage());
+            throw new IllegalArgumentException();
         }
 
         public Builder setY(Double y) {
-            Response response = validateY(y);
-            if (response.getStatus()) {
+            if (validateY(y)) {
                 this.y = y;
                 return this;
             }
-            else
-                throw new IllegalArgumentException(response.getMessage());
+            throw new IllegalArgumentException();
         }
 
         public Builder setZ(Double z) {
-            Response response = validateZ(z);
-            if (response.getStatus()) {
+            if (validateZ(z)) {
                 this.z = z;
                 return this;
             }
-            else
-                throw new IllegalArgumentException(response.getMessage());
+            throw new IllegalArgumentException();
         }
 
         public Builder setName(String name) {
-            Response response = validateName(name);
-            if (response.getStatus()) {
+            if (validateName(name)) {
                 this.name = name;
                 return this;
             }
-            else
-                throw new IllegalArgumentException(response.getMessage());
+            throw new IllegalArgumentException();
         }
 
         public Location build() {
-            if (validateX(x).getStatus() && 
-                validateY(y).getStatus() && 
-                validateZ(z).getStatus() && 
-                validateName(name).getStatus()
+            if (validateX(x) && 
+                validateY(y) && 
+                validateZ(z) && 
+                validateName(name)
             )
                 return new Location(this);
             else

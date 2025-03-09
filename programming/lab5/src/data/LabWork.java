@@ -2,7 +2,7 @@ package data;
 
 import java.time.LocalDateTime;
 
-import utils.Formatter;
+import json.JsonHandler;
 
 public class LabWork implements Comparable<LabWork> {
     private Long id; // != null, > 0, unique, auto
@@ -61,32 +61,32 @@ public class LabWork implements Comparable<LabWork> {
 
     // METHODS
 
-    public static Response validateName(String name) {
+    public static boolean validateName(String name) {
         if (name == null || name.isBlank())
-            return new Response(false, "Name cannot be null or empty");
-        return new Response(true);
+            return false;
+        return true;
     }
 
-    public static Response validateCoordinates(Coordinates coordinates) {
+    public static boolean validateCoordinates(Coordinates coordinates) {
         if (coordinates == null)
-            return new Response(false, "Coordinates cannot be null");
-        return new Response(true);
+            return false;
+        return true;
     }
 
-    public static Response validateMinimalPoint(Long minimalPoint) {
+    public static boolean validateMinimalPoint(Long minimalPoint) {
         if (minimalPoint != null && minimalPoint <= 0)
-            return new Response(false, "Minimal point must be greater than 0");
-        return new Response(true);
+            return false;
+        return true;
     }
 
-    public static Response validateDifficulty(Difficulty difficulty) {
+    public static boolean validateDifficulty(Difficulty difficulty) {
         if (difficulty == null)
-            return new Response(false, "Difficulty cannot be null");
-        return new Response(true);
+            return false;
+        return true;
     }
 
-    public static Response validateAuthor(Person author) {
-        return new Response(true);
+    public static boolean validateAuthor(Person author) {
+        return true;
     }
 
     @Override
@@ -99,17 +99,7 @@ public class LabWork implements Comparable<LabWork> {
 
     @Override
     public String toString() {      
-        return Formatter.getStringsWithIndent(
-            "LabWork {",
-            "id: " + id,
-            "name: " + name,
-            "coordinates: " + coordinates,
-            "creationDate: " + creationDate.format(Formatter.DATE_FORMAT),
-            "minimalPoint: " + minimalPoint,
-            "difficulty: " + difficulty,
-            "author: " + author,
-            "}"
-        );
+        return JsonHandler.getGson().toJson(this);
     }
 
     // INNER CLASSES
@@ -124,56 +114,51 @@ public class LabWork implements Comparable<LabWork> {
         // METHODS
 
         public Builder setName(String name) {
-            Response response = validateName(name);
-            if (response.getStatus()) {
+            if (validateName(name)) {
                 this.name = name;
                 return this;
             }
-            else throw new IllegalArgumentException(response.getMessage());
+            throw new IllegalArgumentException();
         }
 
         public Builder setCoordinates(Coordinates coordinates) {
-            Response response = validateCoordinates(coordinates); 
-            if (response.getStatus()) {
+            if (validateCoordinates(coordinates)) {
                 this.coordinates = coordinates;
                 return this;
             }
-            else throw new IllegalArgumentException(response.getMessage());
+            throw new IllegalArgumentException();
         }
 
         public Builder setMinimalPoint(Long minimalPoint) {
-            Response response = validateMinimalPoint(minimalPoint);
-            if (response.getStatus()) {
+            if (validateMinimalPoint(minimalPoint)) {
                 this.minimalPoint = minimalPoint;
                 return this;
             }
-            else throw new IllegalArgumentException(response.getMessage());
+            throw new IllegalArgumentException();
         }
 
         public Builder setDifficulty(Difficulty difficulty) {
-            Response response = validateDifficulty(difficulty);
-            if (response.getStatus()) {
+            if (validateDifficulty(difficulty)) {
                 this.difficulty = difficulty;
                 return this;
             }
-            else throw new IllegalArgumentException(response.getMessage());
+            throw new IllegalArgumentException();
         }
 
         public Builder setAuthor(Person author) {
-            Response response = validateAuthor(author);
-            if (response.getStatus()) {
+            if (validateAuthor(author)) {
                 this.author = author;
                 return this;
             }
-            else throw new IllegalArgumentException(response.getMessage());
+            throw new IllegalArgumentException();
         }
 
         public LabWork build() {
-            if (validateName(name).getStatus() &&
-                validateCoordinates(coordinates).getStatus() &&
-                validateMinimalPoint(minimalPoint).getStatus() &&
-                validateDifficulty(difficulty).getStatus() &&
-                validateAuthor(author).getStatus()
+            if (validateName(name) &&
+                validateCoordinates(coordinates) &&
+                validateMinimalPoint(minimalPoint) &&
+                validateDifficulty(difficulty) &&
+                validateAuthor(author)
             )
                 return new LabWork(this);
             throw new IllegalArgumentException("Invalid LabWork parameters");

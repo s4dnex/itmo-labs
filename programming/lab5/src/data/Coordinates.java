@@ -1,6 +1,6 @@
 package data;
 
-import utils.Formatter;
+import json.JsonHandler;
 
 public class Coordinates {
     private int x;
@@ -27,12 +27,7 @@ public class Coordinates {
 
     @Override
     public String toString() {
-        return Formatter.getStringsWithIndent(
-            "Coordinates {",
-            "x: " + x,
-            "y: " + y,
-            "}"
-        );
+        return JsonHandler.getGson().toJson(this);
     }
 
     // INNER CLASSES

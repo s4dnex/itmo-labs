@@ -6,24 +6,12 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
-import commands.Add;
-import commands.AddIfMax;
-import commands.Clear;
-import commands.Command;
-import commands.Exit;
-import commands.Help;
-import commands.History;
-import commands.Info;
-import commands.PrintFieldAscendingDifficulty;
-import commands.PrintFieldDescendingAuthor;
-import commands.RemoveById;
-import commands.RemoveLower;
-import commands.Show;
-import commands.SumOfMinimalPoint;
-import commands.Update;
+import commands.*;
+import io.FileHandler;
 
 public class Invoker {
     private final Console console;
+    private final FileHandler fileHandler;
     private final Collection collection;
     private final Queue<Command> executedCommands;
     private final Map<String, Command> commands;
@@ -31,12 +19,13 @@ public class Invoker {
 
     // CONSTRUCTORS
 
-    public Invoker(Console console, Collection collection) {
+    public Invoker(Console console, FileHandler fileHandler, Collection collection) {
         this.console = console;
+        this.fileHandler = fileHandler;
         this.collection = collection;
         executedCommands = new LinkedList<Command>();
         commands = new HashMap<String, Command>();
-        dataBuilder = new DataBuilder(console, collection);
+        dataBuilder = new DataBuilder(console);
 
         registerCommand(new Help(console, commands));
         registerCommand(new Info(console, collection));
@@ -45,6 +34,8 @@ public class Invoker {
         registerCommand(new Update(console, collection, dataBuilder));
         registerCommand(new RemoveById(console, collection));
         registerCommand(new Clear(console, collection));
+        registerCommand(new Save(console, fileHandler, collection));
+        registerCommand(new ExecuteScript(console, this));
         registerCommand(new Exit(console));
         registerCommand(new AddIfMax(console, collection, dataBuilder));
         registerCommand(new RemoveLower(console, collection, dataBuilder));

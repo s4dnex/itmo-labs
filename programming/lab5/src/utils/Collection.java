@@ -22,6 +22,13 @@ public class Collection {
         creationDate = LocalDateTime.now();
     }
 
+    public Collection(TreeSet<LabWork> labWorks) {
+        this();
+        
+        for (LabWork lw : labWorks)
+            add(lw);
+    }
+
     // GETTERS
 
     public long getNextId() {
@@ -42,8 +49,8 @@ public class Collection {
 
     // METHODS
 
-    public ArrayList<LabWork> asArrayList() {
-        return new ArrayList<LabWork>(labWorks);
+    public TreeSet<LabWork> asTreeSet() {
+        return labWorks;
     }
 
     public boolean contains(long id) {
@@ -78,10 +85,6 @@ public class Collection {
 
     public void clear() {
         labWorks.clear();
-    }
-
-    public void save() {
-        // TODO: Implement method
     }
 
     public boolean addIfMax(LabWork labWork) {

@@ -1,6 +1,6 @@
 package data;
 
-import utils.Formatter;
+import json.JsonHandler;
 
 public class Person implements Comparable<Person> {
     private String name; // != null, != empty
@@ -43,32 +43,32 @@ public class Person implements Comparable<Person> {
 
     // METHODS
 
-    public static Response validateName(String name) {
+    public static boolean validateName(String name) {
         if (name == null || name.isBlank())
-            return new Response(false, "Name can't be null or empty");
-        return new Response(true);
+            return false;
+        return true;
     }
 
-    public static Response validateWeight(float weight) {
+    public static boolean validateWeight(float weight) {
         if (weight <= 0)
-            return new Response(false, "Weight must be greater than 0");
-        return new Response(true);
+            return false;
+        return true;
     }
 
-    public static Response validateEyeColor(EyeColor eyeColor) {   
-        return new Response(true);
+    public static boolean validateEyeColor(EyeColor eyeColor) {   
+        return true;
     }
 
-    public static Response validateHairColor(HairColor hairColor) {
+    public static boolean validateHairColor(HairColor hairColor) {
         if (hairColor == null)
-            return new Response(false, "Hair color can't be null");
-        return new Response(true);
+            return false;
+        return true;
     }
 
-    public static Response validateLocation(Location location) {
+    public static boolean validateLocation(Location location) {
         if (location == null)
-            return new Response(false, "Location can't be null");
-        return new Response(true);
+            return false;
+        return true;
     }
 
     @Override
@@ -78,15 +78,7 @@ public class Person implements Comparable<Person> {
 
     @Override
     public String toString() {
-        return Formatter.getStringsWithIndent(
-            "Person {",
-            " name: " + name,
-            " weight: " + weight,
-            " eyeColor: " + eyeColor,
-            " hairColor: " + hairColor,
-            " location: " + location,
-            "}"            
-        );
+        return JsonHandler.getGson().toJson(this);
     }
 
     // INNER CLASSES
@@ -101,55 +93,50 @@ public class Person implements Comparable<Person> {
         // METHODS
 
         public Builder setName(String name) {
-            Response response = validateName(name);
-            if (response.getStatus()) {
+            if (validateName(name)) {
                 this.name = name;
                 return this;
             }
-            else throw new IllegalArgumentException(response.getMessage());
+            throw new IllegalArgumentException();
         }
 
         public Builder setWeight(float weight) {
-            Response response = validateWeight(weight);
-            if (response.getStatus()) {
+            if (validateWeight(weight)) {
                 this.weight = weight;
                 return this;
             }
-            else throw new IllegalArgumentException(response.getMessage());
+            throw new IllegalArgumentException();
         }
 
         public Builder setEyeColor(EyeColor eyeColor) {
-            Response response = validateEyeColor(eyeColor);
-            if (response.getStatus()) {
+            if (validateEyeColor(eyeColor)) {
                 this.eyeColor = eyeColor;
                 return this;
             }
-            else throw new IllegalArgumentException(response.getMessage());
+            throw new IllegalArgumentException();
         }
 
         public Builder setHairColor(HairColor hairColor) {
-            Response response = validateHairColor(hairColor);
-            if (response.getStatus()) {
+            if (validateHairColor(hairColor)) {
                 this.hairColor = hairColor;
                 return this;
             }
-            else throw new IllegalArgumentException(response.getMessage());
+            throw new IllegalArgumentException();
         }
 
         public Builder setLocation(Location location) {
-            Response response = validateLocation(location);
-            if (response.getStatus()) {
+            if (validateLocation(location)) {
                 this.location = location;
                 return this;
             }
-            else throw new IllegalArgumentException(response.getMessage());
+            throw new IllegalArgumentException();
         }
 
         public Person build() {
-            if (validateName(name).getStatus() && 
-                validateWeight(weight).getStatus() &&
-                validateHairColor(hairColor).getStatus() && 
-                validateLocation(location).getStatus()
+            if (validateName(name) && 
+                validateWeight(weight) &&
+                validateHairColor(hairColor) && 
+                validateLocation(location)
             )
                 return new Person(this);
             else throw new IllegalArgumentException("Invalid Person parameters");

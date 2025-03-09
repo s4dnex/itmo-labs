@@ -4,7 +4,6 @@ import utils.Console;
 
 public class Exit extends Command {
     private final Console console;
-
     // CONSTRUCTORS
 
     public Exit(Console console) {
@@ -25,7 +24,7 @@ public class Exit extends Command {
             throw new IllegalArgumentException("Unexpected arguments occurred");
 
 
-        console.closeIO();
+        console.close();
         System.exit(0);
     }
 }

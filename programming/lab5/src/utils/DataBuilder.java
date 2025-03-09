@@ -4,13 +4,11 @@ import data.*;
 
 public class DataBuilder {
     private final Console console;
-    private final Collection collection;
     
     // CONSTRUCTORS
 
-    public DataBuilder(Console console, Collection collection) {
+    public DataBuilder(Console console) {
         this.console = console;
-        this.collection = collection;
     }
 
     // METHODS
@@ -25,8 +23,8 @@ public class DataBuilder {
                 );
                 break;
             }
-            catch (IllegalArgumentException e) {
-                console.println(e.getMessage());
+            catch (Exception e) {
+                handleException("Name cannot be null or empty!");
             }
         }
 
@@ -37,11 +35,8 @@ public class DataBuilder {
                 );
                 break;
             }
-            catch (NumberFormatException|NullPointerException e) {
-                console.println("Minimal point must be an integer");
-            }
-            catch (IllegalArgumentException e) {
-                console.println(e.getMessage());
+            catch (NumberFormatException e) {
+                handleException("Minimal point must be a long integer greater than 0!");
             }
         }
 
@@ -53,7 +48,7 @@ public class DataBuilder {
                 break;
             }
             catch (IllegalArgumentException|NullPointerException e) {
-                console.println(e.getMessage());
+                handleException("Difficulty must be one if available values!");
             }
         }
 
@@ -72,11 +67,8 @@ public class DataBuilder {
                 );
                 break;
             }
-            catch (NumberFormatException|NullPointerException e) {
-                console.println("X coordinate must be an integer");
-            }
-            catch (IllegalArgumentException e) {
-                console.println(e.getMessage());
+            catch (IllegalArgumentException|NullPointerException e) {
+                handleException("X coordinate must be an integer!");
             }
         }
 
@@ -87,11 +79,8 @@ public class DataBuilder {
                 );
                 break;
             }
-            catch (NumberFormatException|NullPointerException e) {
-                console.println("Y coordinate must be a number");
-            }
-            catch (IllegalArgumentException e) {
-                console.println(e.getMessage());
+            catch (IllegalArgumentException|NullPointerException e) {
+                handleException("Y coordinate must be a float number!");
             }
         }
 
@@ -109,7 +98,7 @@ public class DataBuilder {
                 break;
             }
             catch (IllegalArgumentException e) {
-                console.println(e.getMessage());
+                handleException("Name can't be null or empty!");
             }
         }
 
@@ -121,11 +110,8 @@ public class DataBuilder {
                 );
                 break;
             }
-            catch (NumberFormatException|NullPointerException e) {
-                console.println("X coordinate must be a number");
-            }
-            catch (IllegalArgumentException e) {
-                console.println(e.getMessage());
+            catch (IllegalArgumentException|NullPointerException e) {
+                handleException("X coordinate must be a double number!");
             }
         }
 
@@ -136,11 +122,8 @@ public class DataBuilder {
                 );
                 break;
             }
-            catch (NumberFormatException|NullPointerException e) {
-                console.println("Y coordinate must be a number");
-            }
-            catch (IllegalArgumentException e) {
-                console.println(e.getMessage());
+            catch (IllegalArgumentException|NullPointerException e) {
+                handleException("Y coordinate must be a double number!");
             }
         }
 
@@ -151,11 +134,8 @@ public class DataBuilder {
                 );
                 break;
             }
-            catch (NumberFormatException|NullPointerException e) {
-                console.println("Z coordinate must be a number");
-            }
-            catch (IllegalArgumentException e) {
-                console.println(e.getMessage());
+            catch (NullPointerException|IllegalArgumentException e) {
+                handleException("Z coordinate must be a double number!");
             }
         }
 
@@ -173,7 +153,7 @@ public class DataBuilder {
                 break;
             }
             catch (IllegalArgumentException e) {
-                console.println(e.getMessage());
+                handleException("Name can't be null or empty!");
             }
         }
 
@@ -184,11 +164,8 @@ public class DataBuilder {
                 );
                 break;
             }
-            catch (NumberFormatException|NullPointerException e) {
-                console.println("Weight must be a number");
-            }
-            catch (IllegalArgumentException e) {
-                console.println(e.getMessage());
+            catch (NullPointerException|IllegalArgumentException e) {
+                handleException("Weight must be a float number greater than 0!");
             }
         }
 
@@ -200,7 +177,7 @@ public class DataBuilder {
                 break;
             }
             catch (IllegalArgumentException|NullPointerException e) {
-                console.println(e.getMessage());
+                handleException("Eye color must be one of available values or null!");
             }
         }
 
@@ -212,7 +189,7 @@ public class DataBuilder {
                 break;
             }
             catch (IllegalArgumentException|NullPointerException e) {
-                console.println(e.getMessage());
+                handleException("Hair color must be one if available values!");
             }
         }
 
@@ -227,33 +204,60 @@ public class DataBuilder {
         return console.readln();
     }
 
-    public int getInt(String prompt) {
+    public Integer getInt(String prompt) {
         if (console.isInteractiveMode())
             console.print(prompt);
-        return Integer.parseInt(console.readln());
+        
+        String line = console.readln();
+        if (line == null) 
+            return null;
+        return Integer.parseInt(line);
     }
 
-    public long getLong(String prompt) {
+    public Long getLong(String prompt) {
         if (console.isInteractiveMode())
             console.print(prompt);
-        return Long.parseLong(console.readln());
+        
+        String line = console.readln();
+        if (line == null) 
+            return null;
+        return Long.parseLong(line);
     }
 
-    public float getFloat(String prompt) {
+    public Float getFloat(String prompt) {
         if (console.isInteractiveMode())
             console.print(prompt);
-        return Float.parseFloat(console.readln());
+        
+        String line = console.readln();
+        if (line == null)
+            return null;
+        return Float.parseFloat(line);
     }
 
-    public double getDouble(String prompt) {
+    public Double getDouble(String prompt) {
         if (console.isInteractiveMode())
             console.print(prompt);
-        return Double.parseDouble(console.readln());
+
+        String line = console.readln();
+        if (line == null)
+            return null;
+        return Double.parseDouble(line);
     }
 
     public <T extends Enum<T>> T getEnum(Class<T> enumType, String prompt) {
         if (console.isInteractiveMode())
             console.print(prompt);
-        return Enum.valueOf(enumType, console.readln().toUpperCase());
+        
+        String line = console.readln();
+        if (line == null || line.isBlank()) 
+            return null;
+        else 
+            return Enum.valueOf(enumType, line.toUpperCase());
+    }
+
+    private void handleException(String msg) {
+        if (console.isInteractiveMode()) 
+            console.println(msg);
+        else throw new RuntimeException(msg);
     }
 }

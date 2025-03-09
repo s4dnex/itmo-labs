@@ -1,6 +1,6 @@
 package commands;
 
-import java.util.ArrayList;
+import java.util.TreeSet;
 
 import data.LabWork;
 import utils.Collection;
@@ -30,15 +30,16 @@ public class Show extends Command {
         if (args.length != 0) 
             throw new IllegalArgumentException("Unexpected arguments occurred");
 
-        ArrayList<LabWork> labWorks = collection.asArrayList();
+        TreeSet<LabWork> labWorks = collection.asTreeSet();
         if (labWorks.size() == 0) {
             console.println("Collection is empty!");
             return;
         }
 
+        long i = 1;
         console.println("The collection contains " + labWorks.size() + " element(s):");
-        for (int i = 0; i < labWorks.size(); i++) {
-            console.println((i + 1) + ". " + labWorks.get(i));
+        for (LabWork lw : labWorks) {
+            console.println((i++) + ". " + lw);
         }
     }
 }

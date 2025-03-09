@@ -1,4 +1,4 @@
-package utils;
+package io;
 
 public interface InputHandler {
     public String readln();    
