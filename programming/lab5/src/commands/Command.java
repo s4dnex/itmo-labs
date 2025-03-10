@@ -1,5 +1,7 @@
 package commands;
 
+import json.JsonHandler;
+
 public abstract class Command implements Comparable<Command> {
     protected final String name;
     protected final String[] args;
@@ -38,6 +40,6 @@ public abstract class Command implements Comparable<Command> {
 
     @Override
     public String toString() {
-        return name + " " + String.join(" ", args);
+        return "Command " + JsonHandler.getGson().toJson(this);
     }
 }

@@ -19,7 +19,7 @@ public class DataBuilder {
         while (true) {
             try {
                 lwBuilder.setName(
-                    getString("Enter the name: ")
+                    getString("Enter the labwork's name: ")
                 );
                 break;
             }
@@ -31,7 +31,7 @@ public class DataBuilder {
         while (true) {
             try {
                 lwBuilder.setMinimalPoint(
-                    getLong("Enter the minimal point: ")
+                    getLong("Enter the labwork's minimal point: ")
                 );
                 break;
             }
@@ -43,7 +43,7 @@ public class DataBuilder {
         while (true) {
             try {
                 lwBuilder.setDifficulty(
-                    getEnum(Difficulty.class, "Enter the difficulty (" + String.join(", ", Difficulty.getValues()) + "): ")
+                    getEnum(Difficulty.class, "Enter the labwork's difficulty (" + Formatter.getEnumValues(Difficulty.class) + "): ")
                 );
                 break;
             }
@@ -148,12 +148,13 @@ public class DataBuilder {
         while (true) {
             try {
                 personBuilder.setName(
-                    getString("Enter the person's name: ")
+                    getString("Enter the person's name (if you want to skip, enter the blank line): ")
                 );
                 break;
             }
             catch (IllegalArgumentException e) {
-                handleException("Name can't be null or empty!");
+                return null;
+                // handleException("Name can't be null or empty!");
             }
         }
 
@@ -172,7 +173,7 @@ public class DataBuilder {
         while (true) {
             try {
                 personBuilder.setEyeColor(
-                    getEnum(EyeColor.class, "Enter the person's eye color (" + String.join(", ", EyeColor.getValues()) + "): ")
+                    getEnum(EyeColor.class, "Enter the person's eye color (" + Formatter.getEnumValues(EyeColor.class) + "): ")
                 );
                 break;
             }
@@ -184,7 +185,7 @@ public class DataBuilder {
         while (true) {
             try {
                 personBuilder.setHairColor(
-                    getEnum(HairColor.class, "Enter the person's hair color (" + String.join(", ", HairColor.getValues()) + "): ")
+                    getEnum(HairColor.class, "Enter the person's hair color (" + Formatter.getEnumValues(HairColor.class) + "): ")
                 );
                 break;
             }

@@ -27,6 +27,6 @@ public class History extends Command {
         console.println("Last executed commands (up to 15):");
 
         for (Command command : executedCommands)
-            console.println(command);
+            console.println(command.getName());
     }
 }

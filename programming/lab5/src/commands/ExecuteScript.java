@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
 
-import io.FileHandler;
+import io.DefaultFileHandler;
 import utils.Console;
 import utils.Invoker;
 
@@ -45,11 +45,11 @@ public class ExecuteScript extends Command {
                 throw new IllegalArgumentException("Recursion detected.");
             }
             executedScripts.add(path);
-            Queue<String> script = new FileHandler(path).readLines();
+            Queue<String> script = new DefaultFileHandler(path).readLines();
             console.setScriptMode(script);
             while (!script.isEmpty()) {
                 String command = script.poll();
-                console.println(command);
+                // console.println(command);
                 invoker.execute(command);
             }
         } catch (Exception e) {
@@ -58,6 +58,5 @@ public class ExecuteScript extends Command {
             executedScripts.remove(path);
             console.setInteractiveMode();
         }
-
     }
 }

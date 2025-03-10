@@ -52,12 +52,7 @@ public class Invoker {
     }
 
     public void execute(String command) {
-        if (command == null || command.isBlank()) {
-            console.println("Command not found. Type 'help' to see available commands.");
-            return;
-        }
-
-        String[] commandParts = command.trim().split("\s+");
+        String[] commandParts = CommandReader.parse(command);
         command = commandParts[0];
         String[] args = (commandParts.length > 1) ?  Arrays.copyOfRange(commandParts, 1, commandParts.length) : new String[0];
 
@@ -74,7 +69,11 @@ public class Invoker {
                 console.println(e.getMessage());
             }
         }
-        else
-            console.println("Command not found. Type 'help' to see available commands.");
+        else {
+            String msg = "Command not found. Type 'help' to see available commands.";
+            if (console.isInteractiveMode())
+                console.println(msg);
+            else throw new RuntimeException(msg);
+        }
     }
 }

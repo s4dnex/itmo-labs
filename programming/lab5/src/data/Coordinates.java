@@ -27,7 +27,7 @@ public class Coordinates {
 
     @Override
     public String toString() {
-        return JsonHandler.getGson().toJson(this);
+        return "Coordinates " + JsonHandler.getGson().toJson(this);
     }
 
     // INNER CLASSES

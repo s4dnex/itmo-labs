@@ -99,7 +99,7 @@ public class LabWork implements Comparable<LabWork> {
 
     @Override
     public String toString() {      
-        return JsonHandler.getGson().toJson(this);
+        return "LabWork " + JsonHandler.getGson().toJson(this);
     }
 
     // INNER CLASSES

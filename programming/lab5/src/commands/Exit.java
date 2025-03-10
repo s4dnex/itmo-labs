@@ -24,7 +24,12 @@ public class Exit extends Command {
             throw new IllegalArgumentException("Unexpected arguments occurred");
 
 
-        console.close();
-        System.exit(0);
+        try {
+            console.close();
+            System.exit(0);
+        } catch (Exception e) {
+            System.err.println("Couldn't close the console's I/O handlers.");
+            System.exit(1);
+        }
     }
 }

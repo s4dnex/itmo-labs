@@ -15,7 +15,6 @@ public class Console implements InputHandler, OutputHandler {
     // CONSTRUCTORS 
 
     public Console(InputHandler inputHandler, OutputHandler outputHandler) {
-        isInteractiveMode = true;
         this.inputHandler = inputHandler;
         this.outputHandler = outputHandler;
     }
@@ -61,7 +60,7 @@ public class Console implements InputHandler, OutputHandler {
     }
 
     @Override
-    public void close() {
+    public void close() throws Exception {
         inputHandler.close();
         outputHandler.close();
     }

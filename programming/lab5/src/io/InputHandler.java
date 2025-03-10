@@ -1,6 +1,5 @@
 package io;
 
-public interface InputHandler {
-    public String readln();    
-    public void close();
+public interface InputHandler extends AutoCloseable {
+    public String readln();
 }

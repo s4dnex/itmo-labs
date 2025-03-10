@@ -63,7 +63,7 @@ public class Location {
 
     @Override
     public String toString() {
-        return JsonHandler.getGson().toJson(this);
+        return "Location " + JsonHandler.getGson().toJson(this);
     }
 
     // INNER CLASSES

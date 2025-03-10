@@ -78,7 +78,7 @@ public class Person implements Comparable<Person> {
 
     @Override
     public String toString() {
-        return JsonHandler.getGson().toJson(this);
+        return "Person " + JsonHandler.getGson().toJson(this);
     }
 
     // INNER CLASSES

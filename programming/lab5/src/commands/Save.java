@@ -32,7 +32,7 @@ public class Save extends Command {
         
         try {
             fileHandler.write(
-                JsonHandler.getGson().toJson(collection.asTreeSet())
+                JsonHandler.serializeCollection(collection.asTreeSet())
             );      
         } catch (Exception e) {
             console.println("Failed to save to the file: " + e.getMessage());
