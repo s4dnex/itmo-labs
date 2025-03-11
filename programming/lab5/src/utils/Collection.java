@@ -162,10 +162,14 @@ public class Collection {
      * @return number of elements that have been removed
      */
     public long removeLower(LabWork labWork) {
-        return labWorks.stream()
-            .filter(lw -> lw.compareTo(labWork) < 0)
-            .peek(lw -> labWorks.remove(lw))
-            .count();
+        long count = 0;
+        for (LabWork lw : labWorks) {
+            if (lw.compareTo(labWork) < 0) {
+                count++;
+            }
+        }
+        labWorks.removeIf(lw -> lw.compareTo(labWork) < 0);
+        return count;
     }
 
     /**
@@ -175,7 +179,10 @@ public class Collection {
     public long sumOfMinimalPoint() {
         long sum = 0;
         for (LabWork lw : labWorks) {
-            sum += lw.getMinimalPoint();
+            Long mp = lw.getMinimalPoint();
+            
+            if (mp != null)
+                sum += mp;
         }
         return sum;
     }
@@ -200,7 +207,10 @@ public class Collection {
     public List<Person> getDescendingAuthor() {
         List<Person> authors = new ArrayList<Person>();
         for (LabWork lw : labWorks) {
-            authors.add(lw.getAuthor());
+            Person author = lw.getAuthor();
+            
+            if (author != null)
+                authors.add(lw.getAuthor());
         }
         authors.sort(Comparator.reverseOrder());
         return authors;

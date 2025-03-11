@@ -50,7 +50,7 @@ public class ExecuteScript extends Command {
             executedScripts.add(path);
             Queue<String> script = new DefaultFileHandler(path).readLines();
             console.setScriptMode(script);
-            while (!script.isEmpty()) {
+            while (!console.getScript().isEmpty()) {
                 String command = script.poll();
                 // console.println(command);
                 invoker.execute(command);

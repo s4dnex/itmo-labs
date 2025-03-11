@@ -54,6 +54,10 @@ public class Console implements InputHandler, OutputHandler {
         this.script = script;
     }
 
+    public Queue<String> getScript() {
+        return script;
+    }
+
     @Override
     public void print(Object obj) {
         outputHandler.print(obj);

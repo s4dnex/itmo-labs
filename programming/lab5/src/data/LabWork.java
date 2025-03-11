@@ -15,6 +15,9 @@ public class LabWork implements Comparable<LabWork> {
 
     // CONSTRUCTORS
 
+    /**
+     * @param builder {@link Builder}
+     */
     public LabWork(LabWork.Builder builder) {
         this.name = builder.name;
         this.coordinates = builder.coordinates;
@@ -25,7 +28,7 @@ public class LabWork implements Comparable<LabWork> {
         this.creationDate = LocalDateTime.now();
     }
 
-    // GETTERS
+    // GETTERS & SETTERS
 
     public Long getId() {
         return id;
@@ -91,9 +94,17 @@ public class LabWork implements Comparable<LabWork> {
 
     @Override
     public int compareTo(LabWork labWork) {
-        return this.difficulty == labWork.difficulty ?
-                this.minimalPoint.compareTo(labWork.minimalPoint) :
-                this.difficulty.compareTo(labWork.difficulty);
+        if (this.difficulty == labWork.difficulty) {
+            if (this.minimalPoint == null && labWork.minimalPoint == null)
+                return 0;
+            else if (this.minimalPoint == null)
+                return -1;
+            else if (labWork.minimalPoint == null)
+                return 1;
+            else return this.minimalPoint.compareTo(labWork.minimalPoint);
+        }
+        else 
+            return this.difficulty.compareTo(labWork.difficulty);
 
     }
 
@@ -104,6 +115,9 @@ public class LabWork implements Comparable<LabWork> {
 
     // INNER CLASSES
 
+    /**
+     * Class to build {@link LabWork}.
+     */
     public static class Builder {
         private String name;
         private Coordinates coordinates;
@@ -113,6 +127,11 @@ public class LabWork implements Comparable<LabWork> {
 
         // METHODS
 
+        /**
+         * Sets value of field {@code name}.
+         * @param name name
+         * @return {@link Builder} instance
+         */
         public Builder setName(String name) {
             if (validateName(name)) {
                 this.name = name;
@@ -121,6 +140,11 @@ public class LabWork implements Comparable<LabWork> {
             throw new IllegalArgumentException();
         }
 
+        /**
+         * Sets value of field {@code coordinates}.
+         * @param coordinates coordinates
+         * @return {@link Builder} instance
+         */
         public Builder setCoordinates(Coordinates coordinates) {
             if (validateCoordinates(coordinates)) {
                 this.coordinates = coordinates;
@@ -129,6 +153,11 @@ public class LabWork implements Comparable<LabWork> {
             throw new IllegalArgumentException();
         }
 
+        /**
+         * Sets value of field {@code minimalPoint}.
+         * @param minimalPoint minimal points
+         * @return {@link Builder} instance
+         */
         public Builder setMinimalPoint(Long minimalPoint) {
             if (validateMinimalPoint(minimalPoint)) {
                 this.minimalPoint = minimalPoint;
@@ -137,6 +166,11 @@ public class LabWork implements Comparable<LabWork> {
             throw new IllegalArgumentException();
         }
 
+        /**
+         * Sets value of field {@code difficulty}.
+         * @param difficulty difficulty
+         * @return {@link Builder} instance
+         */
         public Builder setDifficulty(Difficulty difficulty) {
             if (validateDifficulty(difficulty)) {
                 this.difficulty = difficulty;
@@ -145,6 +179,11 @@ public class LabWork implements Comparable<LabWork> {
             throw new IllegalArgumentException();
         }
 
+        /**
+         * Sets value of field {@code author}.
+         * @param author author
+         * @return {@link Builder} instance
+         */
         public Builder setAuthor(Person author) {
             if (validateAuthor(author)) {
                 this.author = author;
@@ -153,6 +192,10 @@ public class LabWork implements Comparable<LabWork> {
             throw new IllegalArgumentException();
         }
 
+        /**
+         * Returns new {@link LabWork} instance with set fields.
+         * @return {@link LabWork} 
+         */
         public LabWork build() {
             if (validateName(name) &&
                 validateCoordinates(coordinates) &&

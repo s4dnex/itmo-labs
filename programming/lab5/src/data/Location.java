@@ -10,6 +10,9 @@ public class Location {
 
     // CONSTRUCTORS
 
+    /**
+     * @param builder {@link Builder}
+     */
     public Location(Location.Builder builder) {
         this.x = builder.x;
         this.y = builder.y;
@@ -68,12 +71,21 @@ public class Location {
 
     // INNER CLASSES
 
+    /**
+     * Class to build {@link Location}.
+     */
     public static class Builder {
         private Double x;
         private Double y;
         private Double z;
         private String name;
 
+
+        /**
+         * Sets value of field {@code x}.
+         * @param x coordinate
+         * @return {@link Builder} instance
+         */
         public Builder setX(Double x) {
             if (validateX(x)) {
                 this.x = x;
@@ -82,6 +94,11 @@ public class Location {
             throw new IllegalArgumentException();
         }
 
+        /**
+         * Sets value of field {@code y}.
+         * @param y coordinate
+         * @return {@link Builder} instance
+         */
         public Builder setY(Double y) {
             if (validateY(y)) {
                 this.y = y;
@@ -90,6 +107,11 @@ public class Location {
             throw new IllegalArgumentException();
         }
 
+        /**
+         * Sets value of field {@code z}.
+         * @param z coordinate
+         * @return {@link Builder} instance
+         */
         public Builder setZ(Double z) {
             if (validateZ(z)) {
                 this.z = z;
@@ -98,6 +120,11 @@ public class Location {
             throw new IllegalArgumentException();
         }
 
+        /**
+         * Sets value of field {@code name}.
+         * @param name name
+         * @return {@link Builder} instance
+         */
         public Builder setName(String name) {
             if (validateName(name)) {
                 this.name = name;
@@ -106,6 +133,10 @@ public class Location {
             throw new IllegalArgumentException();
         }
 
+        /**
+         * Returns new {@link Location} instance with set fields.
+         * @return {@link Location} 
+         */
         public Location build() {
             if (validateX(x) && 
                 validateY(y) && 

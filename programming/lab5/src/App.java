@@ -13,7 +13,7 @@ public class App {
     public static void main(String[] args) {
         if (args.length != 1) {
             System.err.println("Pass file path as argument.");
-            System.exit(1);
+            System.exit(-1);
         }
 
         try (
@@ -23,7 +23,7 @@ public class App {
             Path path = Path.of(args[0]);
             if (Files.notExists(path)) {
                 System.err.println("File with such name does not exist.");
-                System.exit(1);
+                System.exit(-1);
             }
 
             FileHandler fileHandler = new DefaultFileHandler(path);
@@ -37,8 +37,8 @@ public class App {
             
             commandReader.enable();
         } catch (Exception e) {
-            System.err.println("Unexpected program error: " + e.getMessage());
-            System.exit(1);
+            System.err.println("Unexpected program error (" + e.getClass() + "): " + e.getMessage());
+            System.exit(-1);
         }
     }
 }

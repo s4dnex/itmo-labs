@@ -11,6 +11,9 @@ public class Person implements Comparable<Person> {
 
     // CONSTRUCTORS
 
+    /**
+     * @param builder {@link Builder}
+     */
     public Person(Person.Builder builder) {
         this.name = builder.name;
         this.weight = builder.weight;
@@ -83,6 +86,9 @@ public class Person implements Comparable<Person> {
 
     // INNER CLASSES
 
+    /**
+     * Class to build {@link Person}.
+     */
     public static class Builder {
         private String name;
         private float weight;
@@ -91,7 +97,12 @@ public class Person implements Comparable<Person> {
         private Location location;
 
         // METHODS
-
+        
+        /**
+         * Sets value of field {@code name}.
+         * @param name name
+         * @return {@link Builder} instance
+         */
         public Builder setName(String name) {
             if (validateName(name)) {
                 this.name = name;
@@ -100,6 +111,11 @@ public class Person implements Comparable<Person> {
             throw new IllegalArgumentException();
         }
 
+        /**
+         * Sets value of field {@code weight}.
+         * @param weight weight
+         * @return {@link Builder} instance
+         */
         public Builder setWeight(float weight) {
             if (validateWeight(weight)) {
                 this.weight = weight;
@@ -108,6 +124,11 @@ public class Person implements Comparable<Person> {
             throw new IllegalArgumentException();
         }
 
+        /**
+         * Sets value of field {@code eyeColor}.
+         * @param eyeColor {@link EyeColor}
+         * @return {@link Builder} instance
+         */
         public Builder setEyeColor(EyeColor eyeColor) {
             if (validateEyeColor(eyeColor)) {
                 this.eyeColor = eyeColor;
@@ -116,6 +137,11 @@ public class Person implements Comparable<Person> {
             throw new IllegalArgumentException();
         }
 
+        /**
+         * Sets value of field {@code hairColor}.
+         * @param hairColor {@link HairColor}
+         * @return {@link Builder} instance
+         */
         public Builder setHairColor(HairColor hairColor) {
             if (validateHairColor(hairColor)) {
                 this.hairColor = hairColor;
@@ -124,6 +150,11 @@ public class Person implements Comparable<Person> {
             throw new IllegalArgumentException();
         }
 
+        /**
+         * Sets value of field {@code location}.
+         * @param location {@link Location}
+         * @return {@link Builder} instance
+         */
         public Builder setLocation(Location location) {
             if (validateLocation(location)) {
                 this.location = location;
@@ -132,6 +163,10 @@ public class Person implements Comparable<Person> {
             throw new IllegalArgumentException();
         }
 
+        /**
+         * Returns new {@link Person} instance with set fields.
+         * @return {@link Person} 
+         */
         public Person build() {
             if (validateName(name) && 
                 validateWeight(weight) &&

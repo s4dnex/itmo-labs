@@ -33,12 +33,13 @@ public class PrintFieldDescendingAuthor extends Command {
         var fields = collection.getDescendingAuthor();
 
         if (fields.isEmpty()) {
-            console.println("Collection is empty!");
+            console.println("There are no authors in collection, yet.");
         }
         else {
+            long i = 1;
             console.println("Authors in descending order:");
             for (var field : fields) {
-                console.println(field);
+                console.println((i++) + ". " + field);
             }
         }
     }

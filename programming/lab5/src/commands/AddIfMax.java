@@ -18,7 +18,7 @@ public class AddIfMax extends Command {
         super(
             "add_if_max", 
             new String[0], 
-            "Add a new element to the collection if its value is greater than the greatest element of this collection"
+            "Add a new element to the collection if it is greater than any other"
         );
 
         this.console = console;

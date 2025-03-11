@@ -45,8 +45,8 @@ public class DataBuilder {
                 );
                 break;
             }
-            catch (NumberFormatException e) {
-                handleException("Minimal point must be a long integer greater than 0!");
+            catch (IllegalArgumentException e) {
+                handleException("Minimal point must be a long integer greater than 0 or null!");
             }
         }
 
