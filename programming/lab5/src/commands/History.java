@@ -4,6 +4,9 @@ import java.util.Queue;
 
 import utils.Console;
 
+/**
+ * Command to show previously executed commands.
+ */
 public class History extends Command {
     private final Console console;
     private final Queue<Command> executedCommands;

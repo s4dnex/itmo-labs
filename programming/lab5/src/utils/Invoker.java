@@ -9,6 +9,9 @@ import java.util.Queue;
 import commands.*;
 import io.FileHandler;
 
+/**
+ * Class to register commands and invoke their execution.
+ */
 public class Invoker {
     private final Console console;
     private final FileHandler fileHandler;
@@ -19,6 +22,11 @@ public class Invoker {
 
     // CONSTRUCTORS
 
+    /**
+     * @param console Class to handle input and output
+     * @param fileHandler Class to handle files
+     * @param collection Class to store and work with data
+     */
     public Invoker(Console console, FileHandler fileHandler, Collection collection) {
         this.console = console;
         this.fileHandler = fileHandler;
@@ -47,10 +55,18 @@ public class Invoker {
 
     // METHODS
 
+    /**
+     * Method to register command to allow further execution
+     * @param command Command to register
+     */
     private void registerCommand(Command command) {
         commands.put(command.getName(), command);
     }
 
+    /**
+     * Method that parses command from String and executes it
+     * @param command Command to execute
+     */
     public void execute(String command) {
         String[] commandParts = CommandReader.parse(command);
         command = commandParts[0];

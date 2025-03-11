@@ -4,6 +4,9 @@ import utils.Collection;
 import utils.Console;
 import utils.DataBuilder;
 
+/**
+ * Command to build element and add it to collection.
+ */
 public class Add extends Command {
     private final Console console;
     private final Collection collection;

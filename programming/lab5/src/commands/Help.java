@@ -8,6 +8,9 @@ import java.util.List;
 import utils.Console;
 import utils.Formatter;
 
+/**
+ * Command to show list of available commands.
+ */
 public class Help extends Command {
     private final Console console;
     private final Map<String, Command> commands;

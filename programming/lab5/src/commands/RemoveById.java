@@ -3,6 +3,9 @@ package commands;
 import utils.Collection;
 import utils.Console;
 
+/**
+ * Command to remove element from collection by its id.
+ */
 public class RemoveById extends Command {
     private final Console console;
     private final Collection collection;

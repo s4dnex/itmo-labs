@@ -5,7 +5,9 @@ import utils.Collection;
 import io.FileHandler;
 import json.JsonHandler;
 
-
+/**
+ * Command to save the collection to the file.
+ */
 public class Save extends Command {
     private final Console console;
     private final FileHandler fileHandler;

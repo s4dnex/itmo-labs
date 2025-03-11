@@ -4,6 +4,9 @@ import utils.Collection;
 import utils.Console;
 import utils.DataBuilder;
 
+/**
+ * Command to remove every element from collection if it is lower than given.
+ */
 public class RemoveLower extends Command {
     private final Console console;
     private final Collection collection;

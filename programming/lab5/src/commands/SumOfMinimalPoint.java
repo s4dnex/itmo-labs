@@ -3,6 +3,9 @@ package commands;
 import utils.Collection;
 import utils.Console;
 
+/**
+ * Command to print sum of minimal points of every element.
+ */
 public class SumOfMinimalPoint extends Command {
     private final Console console;
     private final Collection collection;

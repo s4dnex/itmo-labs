@@ -3,6 +3,9 @@ package commands;
 import utils.Collection;
 import utils.Console;
 
+/**
+ * Command to print element's difficulties in ascending order.
+ */
 public class PrintFieldAscendingDifficulty extends Command {
     private final Console console;
     private final Collection collection;

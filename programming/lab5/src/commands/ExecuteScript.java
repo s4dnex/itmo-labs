@@ -10,6 +10,9 @@ import io.DefaultFileHandler;
 import utils.Console;
 import utils.Invoker;
 
+/**
+ * Command to execute script from a file.
+ */
 public class ExecuteScript extends Command {
     private final Console console;
     private final Invoker invoker;

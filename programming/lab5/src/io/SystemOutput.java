@@ -1,5 +1,8 @@
 package io;
 
+/**
+ * Class to handle output to {@link System} stdout.
+ */
 public class SystemOutput implements OutputHandler {
     @Override
     public void print(Object obj) {

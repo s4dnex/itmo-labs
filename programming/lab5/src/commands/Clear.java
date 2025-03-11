@@ -3,6 +3,9 @@ package commands;
 import utils.Collection;
 import utils.Console;
 
+/**
+ * Command to clear the collection.
+ */
 public class Clear extends Command {
     private final Console console;
     private final Collection collection;

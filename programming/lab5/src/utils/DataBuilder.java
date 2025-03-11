@@ -2,17 +2,27 @@ package utils;
 
 import data.*;
 
+/**
+ * Class to build data for collection.
+ */
 public class DataBuilder {
     private final Console console;
     
     // CONSTRUCTORS
 
+    /**
+     * @param console Class to handle input and output
+     */
     public DataBuilder(Console console) {
         this.console = console;
     }
 
     // METHODS
 
+    /**
+     * Method to set fields and build {@link LabWork}.
+     * @return LabWork instance
+     */
     public LabWork buildLabWork() {
         LabWork.Builder lwBuilder = new LabWork.Builder();
         
@@ -57,6 +67,10 @@ public class DataBuilder {
                         .build();
     }
 
+    /**
+     * Method to set fields and build {@link Coordinates}.
+     * @return Coordinates instance
+     */
     public Coordinates buildCoordinates() {
         Coordinates.Builder coordsBuilder = new Coordinates.Builder();
 
@@ -87,6 +101,10 @@ public class DataBuilder {
         return coordsBuilder.build();
     }
 
+    /**
+     * Method to set fields and build {@link Location}.
+     * @return Location instance
+     */
     public Location buildLocation() {
         Location.Builder locationBuilder = new Location.Builder();
 
@@ -142,6 +160,10 @@ public class DataBuilder {
         return locationBuilder.build();
     }
 
+    /**
+     * Method to set fields and build {@link Person}.
+     * @return Person instance
+     */
     public Person buildPerson() {
         Person.Builder personBuilder = new Person.Builder();
 
@@ -199,12 +221,22 @@ public class DataBuilder {
 
     }
 
+    /**
+     * Method to receive {@link String} from input.
+     * @param prompt Text to request field
+     * @return {@link String} (or {@code null})
+     */
     public String getString(String prompt) {
         if (console.isInteractiveMode())
             console.print(prompt);
         return console.readln();
     }
 
+    /**
+     * Method to receive {@link Integer} from input.
+     * @param prompt Text to request field
+     * @return {@link Integer} (or {@code null})
+     */
     public Integer getInt(String prompt) {
         if (console.isInteractiveMode())
             console.print(prompt);
@@ -215,6 +247,11 @@ public class DataBuilder {
         return Integer.parseInt(line);
     }
 
+    /**
+     * Method to receive {@link Long} from input.
+     * @param prompt Text to request field
+     * @return {@link Long} (or {@code null})
+     */
     public Long getLong(String prompt) {
         if (console.isInteractiveMode())
             console.print(prompt);
@@ -225,6 +262,11 @@ public class DataBuilder {
         return Long.parseLong(line);
     }
 
+    /**
+     * Method to receive {@link Float} from input.
+     * @param prompt Text to request field
+     * @return {@link Float} (or {@code null})
+     */
     public Float getFloat(String prompt) {
         if (console.isInteractiveMode())
             console.print(prompt);
@@ -235,6 +277,11 @@ public class DataBuilder {
         return Float.parseFloat(line);
     }
 
+    /**
+     * Method to receive {@link Double} from input.
+     * @param prompt Text to request field
+     * @return {@link Double} (or {@code null})
+     */
     public Double getDouble(String prompt) {
         if (console.isInteractiveMode())
             console.print(prompt);
@@ -245,6 +292,11 @@ public class DataBuilder {
         return Double.parseDouble(line);
     }
 
+    /**
+     * Method to receive one of {@link Enum} values from input.
+     * @param prompt Text to request field
+     * @return One of {@link Enum} values (or {@code null})
+     */
     public <T extends Enum<T>> T getEnum(Class<T> enumType, String prompt) {
         if (console.isInteractiveMode())
             console.print(prompt);
@@ -256,6 +308,10 @@ public class DataBuilder {
             return Enum.valueOf(enumType, line.toUpperCase());
     }
 
+    /**
+     * Method to handle exception with given message. Prints message to console if {@link Console} in interactive mode, throws {@link RuntimeException} if {@link Console} in script mode.
+     * @param msg Message from exception
+     */
     private void handleException(String msg) {
         if (console.isInteractiveMode()) 
             console.println(msg);

@@ -3,13 +3,18 @@ package utils;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 
+/**
+ * Class to format text and different objects.
+ */
 public class Formatter {
     public final static DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
 
-    public static String getIndentation(int count) {
-        return " ".repeat(count);
-    }
-
+    /**
+     * Returns format (see {@link java.util.Formatter}) of {@link String} to print text with given number of columns with given width.
+     * @param numberOfColumns Number of columns
+     * @param minColumnWidth Minimum width of columns
+     * @return String with needed format
+     */
     public static String getColumnStringFormat(int numberOfColumns, int minColumnWidth) {
         String columnFormat = "%-" + minColumnWidth + "s\t";
         
@@ -22,6 +27,11 @@ public class Formatter {
         return sb.toString();
     }
 
+    /**
+     * Returns {@link String} with commas as delimiter with values of given {@link Enum}.
+     * @param enumClass Enum to take values from
+     * @return String with Enum values
+     */
     public static <T extends Enum<T>> String getEnumValues(Class<T> enumClass) {
         T[] values = enumClass.getEnumConstants();
         

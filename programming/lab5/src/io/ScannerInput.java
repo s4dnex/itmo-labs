@@ -3,6 +3,9 @@ package io;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+/**
+ * Class to handle input with {@link Scanner}.
+ */
 public class ScannerInput implements InputHandler {
     private final Scanner scanner;
 

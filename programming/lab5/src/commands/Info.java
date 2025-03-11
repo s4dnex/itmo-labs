@@ -4,6 +4,9 @@ import utils.Collection;
 import utils.Console;
 import utils.Formatter;
 
+/**
+ * Command to show info about the collection.
+ */
 public class Info extends Command {
     private final Console console;
     private final Collection collection;

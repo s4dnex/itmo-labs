@@ -6,6 +6,9 @@ import data.LabWork;
 import utils.Collection;
 import utils.Console;
 
+/**
+ * Command to show collection elements.
+ */
 public class Show extends Command {
     private final Console console;
     private final Collection collection;

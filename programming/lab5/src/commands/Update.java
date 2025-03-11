@@ -4,6 +4,9 @@ import utils.Collection;
 import utils.Console;
 import utils.DataBuilder;
 
+/**
+ * Command to update element in collection by its id.
+ */
 public class Update extends Command {
     private final Console console;
     private final Collection collection;

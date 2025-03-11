@@ -3,6 +3,9 @@ package commands;
 import utils.Console;
 import utils.Collection;
 
+/**
+ * Command to print element's authors in descending order.
+ */
 public class PrintFieldDescendingAuthor extends Command {
     private final Console console;
     private final Collection collection;

@@ -2,6 +2,9 @@ package commands;
 
 import utils.Console;
 
+/**
+ * Command to exit the program.
+ */
 public class Exit extends Command {
     private final Console console;
     // CONSTRUCTORS

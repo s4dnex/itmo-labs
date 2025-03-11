@@ -12,7 +12,10 @@ import com.google.gson.JsonSerializer;
 
 import utils.Formatter;
 
-public class LocalDateTimeTypeAdapter implements JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {    
+/**
+ * Class to adapt {@link LocalDateTime} to/from JSON.
+ */
+public class LocalDateTimeTypeAdapter implements JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {
     @Override
     public JsonElement serialize(LocalDateTime localDateTime, Type srcType, JsonSerializationContext context) {
       return new JsonPrimitive(localDateTime.format(Formatter.DATE_FORMAT));
