@@ -1,6 +1,7 @@
 package data;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import json.JsonHandler;
 
@@ -94,23 +95,30 @@ public class LabWork implements Comparable<LabWork> {
 
     @Override
     public int compareTo(LabWork labWork) {
-        if (this.difficulty == labWork.difficulty) {
-            if (this.minimalPoint == null && labWork.minimalPoint == null)
-                return 0;
-            else if (this.minimalPoint == null)
-                return -1;
-            else if (labWork.minimalPoint == null)
-                return 1;
-            else return this.minimalPoint.compareTo(labWork.minimalPoint);
-        }
-        else 
-            return this.difficulty.compareTo(labWork.difficulty);
-
+        return this.id.compareTo(labWork.id);
     }
 
     @Override
     public String toString() {      
         return "LabWork " + JsonHandler.getGson().toJson(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this.getClass() != obj.getClass()) 
+            return false;
+        
+        LabWork lw = (LabWork) obj;
+        return this.name.equals(lw.name) &&
+               this.coordinates.equals(lw.coordinates) &&
+               this.minimalPoint.equals(lw.minimalPoint) &&
+               this.difficulty.equals(lw.difficulty) &&
+               this.author.equals(lw.author);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, coordinates, minimalPoint, difficulty, author);
     }
 
     // INNER CLASSES

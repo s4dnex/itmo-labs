@@ -84,6 +84,19 @@ public class Person implements Comparable<Person> {
         return "Person " + JsonHandler.getGson().toJson(this);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this.getClass() != obj.getClass())
+            return false;
+        
+        Person person = (Person) obj;
+        return this.name.equals(person.name) &&
+               this.weight == person.weight &&
+               this.eyeColor.equals(person.eyeColor) &&
+               this.hairColor.equals(person.hairColor) &&
+               this.location.equals(person.location);
+    }
+
     // INNER CLASSES
 
     /**

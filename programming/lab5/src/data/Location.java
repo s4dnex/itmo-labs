@@ -1,5 +1,7 @@
 package data;
 
+import java.util.Objects;
+
 import json.JsonHandler;
 
 public class Location {
@@ -67,6 +69,23 @@ public class Location {
     @Override
     public String toString() {
         return "Location " + JsonHandler.getGson().toJson(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this.getClass() != obj.getClass())
+            return false;
+        
+        Location loc = (Location) obj;
+        return this.x.equals(loc.x) &&
+               this.y.equals(loc.y) &&
+               this.z.equals(loc.z) &&
+               this.name.equals(loc.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, z, name);
     }
 
     // INNER CLASSES

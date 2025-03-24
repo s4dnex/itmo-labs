@@ -32,7 +32,7 @@ public class Exit extends Command {
             System.exit(0);
         } catch (Exception e) {
             System.err.println("Couldn't close the console's I/O handlers.");
-            System.exit(-1);
+            System.exit(1);
         }
     }
 }
