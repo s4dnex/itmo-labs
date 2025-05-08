@@ -3,9 +3,8 @@ CREATE TABLE locations (
     name TEXT,
     latitude DECIMAL NOT NULL CHECK (latitude BETWEEN -90 AND 90),
     longitude DECIMAL NOT NULL CHECK (longitude BETWEEN -180 AND 180),
-    installation_date DATE NOT NULL,
     
-    CONSTRAINT UNIQUE_LOCATION UNIQUE (latitude, longitude)
+    CONSTRAINT unique_location UNIQUE (latitude, longitude)
 );
 
 CREATE TABLE telescopes (
@@ -17,14 +16,15 @@ CREATE TABLE telescopes (
 );
 
 CREATE TABLE shapes (
-    shape_name TEXT PRIMARY KEY,
+    shape_id SERIAL PRIMARY KEY,
+    shape_name TEXT NOT NULL UNIQUE ,
     description TEXT
 );
 
 CREATE TABLE components (
     component_id SERIAL PRIMARY KEY,
     telescope_id INT REFERENCES telescopes(telescope_id) ON DELETE CASCADE,
-    shape_name TEXT REFERENCES shapes(shape_name) ON DELETE SET NULL,
+    shape_id INT REFERENCES shapes(shape_id) ON DELETE SET NULL,
     name TEXT NOT NULL,
     purpose TEXT
 );
@@ -42,26 +42,35 @@ CREATE TABLE maintenances (
     telescope_id INT REFERENCES telescopes(telescope_id) ON DELETE CASCADE,
     employee_id INT REFERENCES employees(employee_id) ON DELETE SET NULL,
     start_date DATE NOT NULL,
-    end_date DATE CHECK (end_date >= start_date),
-
-    CONSTRAINT UNIQUE_MAINTENANCE UNIQUE (telescope_id, employee_id, start_date)
+    end_date DATE CHECK (end_date >= start_date)
 );
 
 CREATE OR REPLACE FUNCTION create_maintenance_on_repair()
     RETURNS TRIGGER AS $$
 DECLARE
     free_employee_id INT;
+    min_experience INTERVAL;
 BEGIN
     IF NEW.status = 'REPAIR' THEN
+        IF EXISTS (
+            SELECT 1 FROM maintenances
+            WHERE telescope_id = NEW.telescope_id
+        ) THEN
+            min_experience := INTERVAL '5 years';
+        ELSE
+            min_experience := INTERVAL '3 years';
+        END IF;
+
         SELECT employee_id
         INTO free_employee_id
         FROM employees
-        WHERE NOT EXISTS (
-            SELECT 1
-            FROM maintenances
-            WHERE (employees.employee_id = maintenances.employee_id)
-              AND (maintenances.end_date IS NULL OR maintenances.end_date > CURRENT_DATE)
-        )
+        WHERE AGE(employees.hire_date) > min_experience
+            AND NOT EXISTS
+                (SELECT 1
+                FROM maintenances
+                WHERE (employees.employee_id = maintenances.employee_id)
+                       AND (maintenances.end_date IS NULL OR maintenances.end_date > CURRENT_DATE)
+                )
         LIMIT 1;
 
         IF free_employee_id IS NOT NULL THEN
@@ -80,13 +89,12 @@ CREATE TRIGGER trigger_create_maintenance
     FOR EACH ROW
 EXECUTE FUNCTION create_maintenance_on_repair();
 
-INSERT INTO locations (name, latitude, longitude, installation_date) VALUES ('Some cool place I think', 22, 23, '2021-01-01');
+INSERT INTO locations (name, latitude, longitude) VALUES ('Some cool place I think', 22, 23);
 INSERT INTO telescopes (location_id, name, status, height) VALUES (1, 'Thousand-feet', 'ACTIVE', 304.8);
 INSERT INTO shapes (shape_name, description) VALUES ('Triangular', 'Looks like a triangle');
 INSERT INTO shapes (shape_name, description) VALUES ('Circular', 'Just a circle');
-INSERT INTO components (telescope_id, shape_name, name, purpose) VALUES (1, 'Circular', 'Giant cup', 'Amplify signals?');
-INSERT INTO components (telescope_id, shape_name, name, purpose) VALUES (1, 'Triangular', 'Antenna unit', 'Catch signals');
-INSERT INTO components (telescope_id, shape_name, name, purpose) VALUES (1, NULL, 'Waveguide', 'Guide waves');
+INSERT INTO components (telescope_id, shape_id, name, purpose) VALUES (1, 1, 'Giant cup', 'Amplify signals?');
+INSERT INTO components (telescope_id, shape_id, name, purpose) VALUES (1, 2, 'Antenna unit', 'Catch signals');
+INSERT INTO components (telescope_id, shape_id, name, purpose) VALUES (1, NULL, 'Waveguide', 'Guide waves');
 INSERT INTO employees (first_name, last_name, position, hire_date) VALUES ('Johnny', 'Silverhand', 'Engineer', '2000-01-01');
 INSERT INTO maintenances (telescope_id, employee_id, start_date, end_date) VALUES (1, 1, '2021-01-01', '2021-01-02');
-
