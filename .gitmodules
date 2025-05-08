@@ -1,0 +1,3 @@
+[submodule "programming/lab6"]
+	path = programming/lab6
+	url = https://github.com/s4dnex/prog-lab6.git
