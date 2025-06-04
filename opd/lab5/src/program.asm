@@ -3,26 +3,26 @@ TEMP: WORD ?
 NUL: WORD 0x00
 ADDR: WORD $STRING ; next word address
 
-START:
+MAIN:
     LD (ADDR)+
     ST TEMP
     SWAB
     PUSH
-    CALL $FUNC
+    CALL $PRINT_SYMBOL
     POP
     LD TEMP
     PUSH
-    CALL $FUNC
+    CALL $PRINT_SYMBOL
     POP
-    JUMP START
+    JUMP MAIN
 
-FUNC:
+PRINT_SYMBOL:
     IN 3
     AND #0x40
-    BEQ FUNC ; spin-loop until ready
+    BEQ PRINT_SYMBOL ; spin-loop until ready
     LD &1
     OUT 2
-    CMP NUL
+    CMP $NUL
     BEQ STOP
     RET
 
@@ -33,3 +33,7 @@ ORG 0x5E9
 STRING: WORD 0xC2B5 ; ТЕ
 WORD 0xC1C2 ; СТ
 WORD 0x0
+
+; Как общаются суперкомпьютеры? (interconnect)
+; Enterprise Storage (NetworkAttachmentStorage, StorageAttachmentNetwork), (блочные, файловые блоки), (fiber channel)
+; real-time devices
