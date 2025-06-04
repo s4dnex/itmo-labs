@@ -1,8 +1,8 @@
-NUM1_LOW: WORD 0x0
-NUM1_HIGH: WORD 0x4140
+NUM1_LOW: WORD 0x2666
+NUM1_HIGH: WORD 0xC4FD
 
-NUM2_LOW: WORD 0x0
-NUM2_HIGH: WORD 0x41CC
+NUM2_LOW: WORD 0xE979
+NUM2_HIGH: WORD 0x42F6
 
 NUM1_EXP: WORD 0x0
 NUM1_POW: WORD 0x0
@@ -104,6 +104,7 @@ FLOAT_SUM: ; void (float) sum()
         LD $TEMP_HIGH
         ST $NUM2_HIGH
         CALL $PARSE_FLOAT_NUMS
+
     SUM_PRENORMALIZE:
         LD $NUM1_POW
         ST $FLOAT_NUM_POW
@@ -113,22 +114,20 @@ FLOAT_SUM: ; void (float) sum()
         ADD $NUM1_POW
         ST &0
 
-        LD $NUM2_MANTIS_LOW
-        ST FLOAT_NUM_MANTIS_LOW
-        LD $NUM2_MANTIS_HIGH
-        ST FLOAT_NUM_MANTIS_HIGH
-
         SUM_MANTIS_SHIFT:
             CLC
-            LD $FLOAT_NUM_MANTIS_HIGH
+            LD $NUM2_MANTIS_HIGH
             ROR
-            ST $FLOAT_NUM_MANTIS_HIGH
-            LD $FLOAT_NUM_MANTIS_LOW
+            ST $NUM2_MANTIS_HIGH
+            LD $NUM2_MANTIS_LOW
             ROR
-            ST $FLOAT_NUM_MANTIS_LOW
+            ST $NUM2_MANTIS_LOW
         LOOP &0
         JUMP SUM_MANTIS_SHIFT
+
     CHECK_SIGNS:
+        ; LD #11
+        ; HLT ; DEBUG
         LD $NUM1_HIGH
         PUSH
         CALL $GET_SIGN
@@ -143,6 +142,7 @@ FLOAT_SUM: ; void (float) sum()
         CMP &0
         BEQ SUM_MANTISES
         JUMP COMPARE_MANTISES
+
     SUM_MANTISES:
         LD $NUM1_HIGH
         PUSH
@@ -155,9 +155,9 @@ FLOAT_SUM: ; void (float) sum()
         ST $ADD32_A_LOW
         LD $NUM1_MANTIS_HIGH
         ST $ADD32_A_HIGH
-        LD $FLOAT_NUM_MANTIS_LOW
+        LD $NUM2_MANTIS_LOW
         ST $ADD32_B_LOW
-        LD $FLOAT_NUM_MANTIS_HIGH
+        LD $NUM2_MANTIS_HIGH
         ST $ADD32_B_HIGH
         CALL $ADD32
         LD $ADD32_RES_LOW
@@ -165,9 +165,67 @@ FLOAT_SUM: ; void (float) sum()
         LD $ADD32_RES_HIGH
         ST FLOAT_NUM_MANTIS_HIGH
         JUMP SUM_NORMALIZE
+    
     COMPARE_MANTISES:
-        NOP
-        ; TODO
+        LD $NUM1_MANTIS_HIGH
+        CMP $NUM2_MANTIS_HIGH
+        BEQ COMPARE_LOWER_MANTISES
+        BLO NUM2_MANTIS_LARGER
+
+    NUM1_MANTIS_LARGER:
+        ; LD #11
+        ; HLT ; DEBUG
+        LD $NUM1_HIGH
+        PUSH
+        CALL $GET_SIGN
+        SWAP
+        POP
+        ST $FLOAT_NUM_SIGN
+
+        LD $NUM1_MANTIS_LOW
+        ST $SUB32_A_LOW
+        LD $NUM1_MANTIS_HIGH
+        ST $SUB32_A_HIGH
+        LD $NUM2_MANTIS_LOW
+        ST $SUB32_B_LOW
+        LD $NUM2_MANTIS_HIGH
+        ST $SUB32_B_HIGH
+        CALL $SUB32
+        LD $SUB32_RES_LOW
+        ST $FLOAT_NUM_MANTIS_LOW
+        LD $SUB32_RES_HIGH
+        ST $FLOAT_NUM_MANTIS_HIGH
+        JUMP SUM_NORMALIZE
+    
+    NUM2_MANTIS_LARGER:
+        LD $NUM2_HIGH
+        PUSH
+        CALL $GET_SIGN
+        SWAP
+        POP
+        ST $FLOAT_NUM_SIGN
+
+        LD $NUM2_MANTIS_LOW
+        ST $SUB32_A_LOW
+        LD $NUM2_MANTIS_HIGH
+        ST $SUB32_A_HIGH
+        LD $NUM1_MANTIS_LOW
+        ST $SUB32_B_LOW
+        LD $NUM1_MANTIS_HIGH
+        ST $SUB32_B_HIGH
+        CALL $SUB32
+        LD $SUB32_RES_LOW
+        ST $FLOAT_NUM_MANTIS_LOW
+        LD $SUB32_RES_HIGH
+        ST $FLOAT_NUM_MANTIS_HIGH
+        JUMP SUM_NORMALIZE
+
+    COMPARE_LOWER_MANTISES:
+        LD $NUM1_MANTIS_LOW
+        CMP $NUM2_MANTIS_LOW
+        BGE NUM1_MANTIS_LARGER
+        JUMP NUM2_MANTIS_LARGER
+
     SUM_NORMALIZE:
         LD $FLOAT_NUM_MANTIS_HIGH
         AND $MANTIS_OVERFLOW_BIT
@@ -187,22 +245,40 @@ FLOAT_SUM: ; void (float) sum()
         JUMP SUM_RETURN
 
     CHECK_DENORMALIZATION:
-        NOP
-        ; TODO
+        LD $FLOAT_NUM_MANTIS_HIGH
+        BZS SUM_RETURN
+        SXTB
+        BMI SUM_RETURN
+
+        ; "UNDERFLOW"
+        CLC
+        LD $FLOAT_NUM_MANTIS_LOW
+        ROL
+        ST $FLOAT_NUM_MANTIS_LOW
+        LD $FLOAT_NUM_MANTIS_HIGH
+        ROL
+        ST $FLOAT_NUM_MANTIS_HIGH
+        LD $FLOAT_NUM_POW
+        DEC
+        ST $FLOAT_NUM_POW
+        JUMP CHECK_DENORMALIZATION
 
     SUM_RETURN:
-        LD #0
-        ST $FLOAT_NUM_HIGH
-
         LD $FLOAT_NUM_SIGN
-        BPL SUM_RETURN_POS
-        LD $NEGATIVE_SIGN
-        ST $FLOAT_NUM_HIGH
+        BZS SET_POSITIVE_SIGN
+
+        SET_NEGATIVE_SIGN:
+            LD $NEGATIVE_SIGN
+            ST $FLOAT_NUM_HIGH
+            JUMP SUM_RETURN_ASSEMBLE
         
-        SUM_RETURN_POS:
-        LD #11
-        HLT
-        
+        SET_POSITIVE_SIGN:
+            CLA
+            ST $FLOAT_NUM_HIGH
+            JUMP SUM_RETURN_ASSEMBLE
+
+        SUM_RETURN_ASSEMBLE:    ; HIGH = SIGN (15) + EXPONENT (14..7) + MANTIS_HIGH(6..0) 
+                                ; LOW  = MANTIS_LOW (15..0)
         LD #7
         ST &0
         LD $FLOAT_NUM_POW
@@ -211,14 +287,13 @@ FLOAT_SUM: ; void (float) sum()
             CLC
             ROL
         LOOP &0
-        JUMP SUM_EXPONENT_SHIFT
+        JUMP SUM_EXPONENT_SHIFT ; SHIFT EXPONENT TO (14..7) BITS
 
-
-        OR $FLOAT_NUM_HIGH
+        OR $FLOAT_NUM_HIGH      ; SIGN | EXPONENT (14..7)
         ST $FLOAT_NUM_HIGH
-        LD $FLOAT_NUM_MANTIS_HIGH
-        AND $HIGH_MANTIS_MASK
-        OR $FLOAT_NUM_HIGH
+        LD $FLOAT_NUM_MANTIS_HIGH   ;
+        AND $HIGH_MANTIS_MASK       ; MANTIS_HIGH & 0x7F
+        OR $FLOAT_NUM_HIGH          ; SIGN | EXPONENT(14..7) | MANTIS_HIGH(6..0)
         ST $FLOAT_NUM_HIGH
 
         LD $FLOAT_NUM_MANTIS_LOW
@@ -252,6 +327,55 @@ ADD32: ; void (int32) add32(int16 a_low, int16 a_high, int16 b_low, int16 b_high
     LD ADD32_A_HIGH
     ADC ADD32_B_HIGH
     ST ADD32_RES_HIGH
+    RET
+
+NEG32_NUM_LOW: WORD ?
+NEG32_NUM_HIGH: WORD ?
+NEG32_RES_LOW: WORD ?
+NEG32_RES_HIGH: WORD ?
+NEG32: ; void (int32) neg32(int16 num_low, int16 num_high)
+    LD NEG32_NUM_LOW
+    NOT
+    ST $ADD32_A_LOW
+    LD NEG32_NUM_HIGH
+    NOT
+    ST $ADD32_A_HIGH
+    LD #1
+    ST $ADD32_B_LOW
+    CLA
+    ST $ADD32_B_HIGH
+    CALL $ADD32
+    LD $ADD32_RES_LOW
+    ST NEG32_RES_LOW
+    LD $ADD32_RES_HIGH
+    ST NEG32_RES_HIGH
+    RET
+
+SUB32_A_LOW: WORD ?
+SUB32_A_HIGH: WORD ?
+SUB32_B_LOW: WORD ?
+SUB32_B_HIGH: WORD ?
+SUB32_RES_LOW: WORD ?
+SUB32_RES_HIGH: WORD ?
+SUB32: ; void (int32) sub32(int16 a_low, int16 a_high, int16 b_low, int16 b_high)
+    LD SUB32_B_LOW
+    ST $NEG32_NUM_LOW
+    LD SUB32_B_HIGH
+    ST $NEG32_NUM_HIGH
+    CALL $NEG32
+    LD $NEG32_RES_LOW
+    ST $ADD32_B_LOW
+    LD $NEG32_RES_HIGH
+    ST $ADD32_B_HIGH
+    LD SUB32_A_LOW
+    ST $ADD32_A_LOW
+    LD SUB32_A_HIGH
+    ST $ADD32_A_HIGH
+    CALL $ADD32
+    LD $ADD32_RES_LOW
+    ST SUB32_RES_LOW
+    LD $ADD32_RES_HIGH
+    ST SUB32_RES_HIGH
     RET
 
 NUM_LOW: WORD ?
