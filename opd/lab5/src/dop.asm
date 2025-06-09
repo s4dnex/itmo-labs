@@ -1,8 +1,8 @@
-NUM1_LOW: WORD 0x2666
-NUM1_HIGH: WORD 0xC4FD
+NUM1_LOW: WORD 0x0
+NUM1_HIGH: WORD 0x4480
 
-NUM2_LOW: WORD 0xE979
-NUM2_HIGH: WORD 0x42F6
+NUM2_LOW: WORD 0x1000
+NUM2_HIGH: WORD 0xC480
 
 NUM1_EXP: WORD 0x0
 NUM1_POW: WORD 0x0
@@ -22,11 +22,17 @@ START:
     CALL $PARSE_FLOAT_NUMS
     CALL $FLOAT_SUM
     LD $FLOAT_NUM_LOW
-    HLT
+    ST $NUM_LOW
     LD $FLOAT_NUM_HIGH
-    HLT
+    ST $NUM_HIGH
+    LD $FLOAT_NUM_SIGN
+    ST $NUM_SIGN
+    CALL $FLOAT_TO_BINARIES
+    CALL $PRINT_BINARIES
 
 PARSE_FLOAT_NUMS:
+    ; LD #10
+    ; HLT
     ; num1 data
     LD NUM1_HIGH
     PUSH
@@ -106,6 +112,8 @@ FLOAT_SUM: ; void (float) sum()
         CALL $PARSE_FLOAT_NUMS
 
     SUM_PRENORMALIZE:
+        ; LD #11
+        ; HLT ; DEBUG
         LD $NUM1_POW
         ST $FLOAT_NUM_POW
 
@@ -113,6 +121,7 @@ FLOAT_SUM: ; void (float) sum()
         NEG
         ADD $NUM1_POW
         ST &0
+        BZS CHECK_SIGNS
 
         SUM_MANTIS_SHIFT:
             CLC
@@ -246,23 +255,36 @@ FLOAT_SUM: ; void (float) sum()
 
     CHECK_DENORMALIZATION:
         LD $FLOAT_NUM_MANTIS_HIGH
-        BZS SUM_RETURN
-        SXTB
-        BMI SUM_RETURN
-
-        ; "UNDERFLOW"
-        CLC
+        BZC CHECK_UNDERFLOW
         LD $FLOAT_NUM_MANTIS_LOW
-        ROL
-        ST $FLOAT_NUM_MANTIS_LOW
-        LD $FLOAT_NUM_MANTIS_HIGH
-        ROL
-        ST $FLOAT_NUM_MANTIS_HIGH
-        LD $FLOAT_NUM_POW
-        DEC
-        ST $FLOAT_NUM_POW
-        JUMP CHECK_DENORMALIZATION
+        BZS SUM_IS_ZERO
 
+        CHECK_UNDERFLOW:
+            LD $FLOAT_NUM_MANTIS_HIGH 
+            SXTB
+            BMI SUM_RETURN
+
+            ; "UNDERFLOW"
+            CLC
+            LD $FLOAT_NUM_MANTIS_LOW
+            ROL
+            ST $FLOAT_NUM_MANTIS_LOW
+            LD $FLOAT_NUM_MANTIS_HIGH
+            ROL
+            ST $FLOAT_NUM_MANTIS_HIGH
+            LD $FLOAT_NUM_POW
+            DEC
+            ST $FLOAT_NUM_POW
+            JUMP CHECK_UNDERFLOW
+
+    SUM_IS_ZERO:
+        CLA
+        ST $FLOAT_NUM_MANTIS_LOW
+        ST $FLOAT_NUM_MANTIS_HIGH
+        ST $FLOAT_NUM_SIGN
+        LD #-127
+        ST $FLOAT_NUM_POW
+    
     SUM_RETURN:
         LD $FLOAT_NUM_SIGN
         BZS SET_POSITIVE_SIGN
@@ -279,29 +301,29 @@ FLOAT_SUM: ; void (float) sum()
 
         SUM_RETURN_ASSEMBLE:    ; HIGH = SIGN (15) + EXPONENT (14..7) + MANTIS_HIGH(6..0) 
                                 ; LOW  = MANTIS_LOW (15..0)
-        LD #7
-        ST &0
-        LD $FLOAT_NUM_POW
-        ADD #127
-        SUM_EXPONENT_SHIFT:
-            CLC
-            ROL
-        LOOP &0
-        JUMP SUM_EXPONENT_SHIFT ; SHIFT EXPONENT TO (14..7) BITS
+            LD #7
+            ST &0
+            LD $FLOAT_NUM_POW
+            ADD #127
+            SUM_EXPONENT_SHIFT:
+                CLC
+                ROL
+            LOOP &0
+            JUMP SUM_EXPONENT_SHIFT ; SHIFT EXPONENT TO (14..7) BITS
 
-        OR $FLOAT_NUM_HIGH      ; SIGN | EXPONENT (14..7)
-        ST $FLOAT_NUM_HIGH
-        LD $FLOAT_NUM_MANTIS_HIGH   ;
-        AND $HIGH_MANTIS_MASK       ; MANTIS_HIGH & 0x7F
-        OR $FLOAT_NUM_HIGH          ; SIGN | EXPONENT(14..7) | MANTIS_HIGH(6..0)
-        ST $FLOAT_NUM_HIGH
+            OR $FLOAT_NUM_HIGH      ; SIGN | EXPONENT (14..7)
+            ST $FLOAT_NUM_HIGH
+            LD $FLOAT_NUM_MANTIS_HIGH   ;
+            AND $HIGH_MANTIS_MASK       ; MANTIS_HIGH & 0x7F
+            OR $FLOAT_NUM_HIGH          ; SIGN | EXPONENT(14..7) | MANTIS_HIGH(6..0)
+            ST $FLOAT_NUM_HIGH
 
-        LD $FLOAT_NUM_MANTIS_LOW
-        ST $FLOAT_NUM_LOW
-        
-        SWAP
-        POP
-        RET
+            LD $FLOAT_NUM_MANTIS_LOW
+            ST $FLOAT_NUM_LOW
+            
+            SWAP
+            POP
+            RET
 
 
 GET_SIGN: ; boolean get_sign(num_high)
@@ -378,11 +400,11 @@ SUB32: ; void (int32) sub32(int16 a_low, int16 a_high, int16 b_low, int16 b_high
     ST SUB32_RES_HIGH
     RET
 
-NUM_LOW: WORD ?
-NUM_HIGH: WORD ?
+NUM_LOW: WORD 0x0
+NUM_HIGH: WORD 0x0
 MANTIS_LOW: WORD 0x0
 MANTIS_HIGH: WORD 0x0
-
+NUM_SIGN: WORD 0x0
 EXP_MASK: WORD 0x7F80 ; exponent mask
 HIGH_MANTIS_MASK: WORD 0x007F ; 22..16 mantis' bits mask
 MANTIS_HIDDEN_BIT: WORD 0x80
@@ -409,7 +431,7 @@ FLOAT_TO_BINARIES:
     PUSH
     CALL $GET_MANTIS
     POP
-    POP ; calculated mantis -> MANTIS_LOW, MANTIS_HIGH
+    POP             ; calculated mantis -> MANTIS_LOW, MANTIS_HIGH
 
     LD NUM_HIGH
     PUSH
@@ -421,7 +443,7 @@ FLOAT_TO_BINARIES:
     CALL $GET_POW
     SWAP
     POP
-    ST $POW ; calculated power -> POW
+    ST $POW         ; calculated power -> POW
     
     LD $MANTIS_HIGH
     PUSH
@@ -565,8 +587,8 @@ GET_INTEGER_PARTS: ; void (int64) get_integer_part(pow, mantis_low, mantis_high)
 
 GET_FRACTION_PARTS: ; void (int64) get_fraction_part(pow, mantis_low, mantis_high)
     CLA
-    PUSH ; frac3
-    PUSH ; frac2
+    PUSH    ; frac3
+    PUSH    ; frac2
     PUSH    ; frac1
     PUSH    ; frac0
     LD &7   ; mantis_high -> frac3
@@ -653,3 +675,36 @@ GET_FRACTION_PARTS: ; void (int64) get_fraction_part(pow, mantis_low, mantis_hig
         POP
         ST $FRAC_PART_3
         RET
+
+
+ISO_SYMBOL_ZERO: WORD 0x30
+ISO_SYMBOL_PLUS: WORD 0x2B ; MINUS - 2D
+
+
+PRINT_BINARIES:
+    LD $NUM_SIGN
+    CALL $PRINT_SIGN_ISO8859
+
+
+DIV64_TEMP_LOW: WORD 0x0
+DIV64_TEMP_HIGH: WORD 0x0
+DIV64_REM: WORD 0x0
+DIV64_BY_10:
+    CLA
+    ST $DIV64_TEMP_HIGH
+    LD $INT_PART_3
+    ST $DIV64_TEMP_LOW
+    
+
+PRINT_SIGN_ISO8859: ; void print_sign_iso8859(boolean sign)
+    ASL             ; if ac = 0x1, then we have minus sign, which is 2 steps away from plus, so *2
+    ADD $ISO_SYMBOL_PLUS
+    OUT 0xC
+    RET
+
+
+PRINT_DIGIT_ISO8859: ; void print_digit_iso8859(int4 digit) 
+    ADD $ISO_SYMBOL_0; ac=digit in binary form, so add zero digit in iso8859 and get correct one
+    OUT 0xC
+    RET
+
