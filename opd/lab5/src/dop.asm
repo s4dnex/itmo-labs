@@ -1,8 +1,10 @@
-NUM1_LOW: WORD 0x0
-NUM1_HIGH: WORD 0x4480
+; first number
+NUM1_LOW: WORD 0x4396
+NUM1_HIGH: WORD 0x3f0b
 
-NUM2_LOW: WORD 0x1000
-NUM2_HIGH: WORD 0xC480
+; second number
+NUM2_LOW: WORD 0xe979
+NUM2_HIGH: WORD 0x42f6
 
 NUM1_EXP: WORD 0x0
 NUM1_POW: WORD 0x0
@@ -29,6 +31,7 @@ START:
     ST $NUM_SIGN
     CALL $FLOAT_TO_BINARIES
     CALL $PRINT_BINARIES
+    HLT
 
 PARSE_FLOAT_NUMS:
     ; LD #10
@@ -282,7 +285,6 @@ FLOAT_SUM: ; void (float) sum()
         ST $FLOAT_NUM_MANTIS_LOW
         ST $FLOAT_NUM_MANTIS_HIGH
         ST $FLOAT_NUM_SIGN
-        LD #-127
         ST $FLOAT_NUM_POW
     
     SUM_RETURN:
@@ -304,6 +306,7 @@ FLOAT_SUM: ; void (float) sum()
             LD #7
             ST &0
             LD $FLOAT_NUM_POW
+            BZS FLOAT_ASSEMBLE
             ADD #127
             SUM_EXPONENT_SHIFT:
                 CLC
@@ -311,6 +314,7 @@ FLOAT_SUM: ; void (float) sum()
             LOOP &0
             JUMP SUM_EXPONENT_SHIFT ; SHIFT EXPONENT TO (14..7) BITS
 
+            FLOAT_ASSEMBLE:
             OR $FLOAT_NUM_HIGH      ; SIGN | EXPONENT (14..7)
             ST $FLOAT_NUM_HIGH
             LD $FLOAT_NUM_MANTIS_HIGH   ;
@@ -456,13 +460,13 @@ FLOAT_TO_BINARIES:
     POP
     POP
     LD $INT_PART_0
-    HLT
+    ; HLT
     LD $INT_PART_1
-    HLT
+    ; HLT
     LD $INT_PART_2
-    HLT
+    ; HLT
     LD $INT_PART_3
-    HLT
+    ; HLT
 
     LD $MANTIS_HIGH
     PUSH
@@ -475,13 +479,13 @@ FLOAT_TO_BINARIES:
     POP
     POP
     LD $FRAC_PART_0
-    HLT
+    ; HLT
     LD $FRAC_PART_1
-    HLT
+    ; HLT
     LD $FRAC_PART_2
-    HLT
+    ; HLT
     LD $FRAC_PART_3
-    HLT
+    ; HLT
 
 GET_EXPONENT: ; uint8 get_exponent(num_high)
     PUSH
@@ -521,6 +525,16 @@ GET_INTEGER_PARTS: ; void (int64) get_integer_part(pow, mantis_low, mantis_high)
     LD &7   ; mantis_high -> int1
     ST &1   ; int1
     LD &5
+    
+    GIP_IF_NUM_IS_ZERO:
+        CMP #-127
+        BZC GIP_IF_GREATER_THAN_23
+        CLA
+        ST &0
+        ST &1
+        ST &2
+        ST &3
+        JUMP GIP_RETURN
     GIP_IF_GREATER_THAN_23:
         CMP #23 ; if (pow >= 23)
         BLT GIP_IF_LESS_THAN_0 ; jump to if (pow < 0)
@@ -611,6 +625,15 @@ GET_FRACTION_PARTS: ; void (int64) get_fraction_part(pow, mantis_low, mantis_hig
         POP
     
     LD &5   ; pow -> AC
+    GFP_IF_NUM_IS_ZERO:
+        CMP #-127
+        BZC GFP_IF_GREATER_THAN_23
+        CLA
+        ST &0
+        ST &1
+        ST &2
+        ST &3
+        JUMP GFP_RETURN
     GFP_IF_GREATER_THAN_23:
         CMP #23 ; if (pow >= 23)
         BLT GFP_IF_LESS_THAN_0 ; jump to if (pow < 0)
@@ -680,21 +703,149 @@ GET_FRACTION_PARTS: ; void (int64) get_fraction_part(pow, mantis_low, mantis_hig
 ISO_SYMBOL_ZERO: WORD 0x30
 ISO_SYMBOL_PLUS: WORD 0x2B ; MINUS - 2D
 
+DIGITS: WORD 16 DUP (?)
+DIGITS_SIZE: WORD 0x0
+DIGITS_PTR: WORD $DIGITS
 
 PRINT_BINARIES:
     LD $NUM_SIGN
     CALL $PRINT_SIGN_ISO8859
+    LD $INT_PART_0
+    ST $DIV32_NUM_LOW
+    LD $INT_PART_1
+    ST $DIV32_NUM_HIGH
+    CALL $DIV32_BY_10
+    ; LD #12
+    ; HLT ; debug
+    STORE_INT_DIGITS_LOOP:
+        LD $DIV32_REM
+        ST (DIGITS_PTR)+
+        LD $DIGITS_SIZE
+        INC
+        ST $DIGITS_SIZE
+        LD $DIV32_QUOT
+        BZS PRINT_INT_DIGITS_LOOP
+        BLT PRINT_INT_DIGITS_LOOP
+        ST $DIV32_NUM_LOW
+        CLA
+        ST $DIV32_NUM_HIGH
+        CALL $DIV32_BY_10
+        JUMP STORE_INT_DIGITS_LOOP
 
+    PRINT_INT_DIGITS_LOOP:
+        LD -(DIGITS_PTR)
+        CALL $PRINT_DIGIT_ISO8859
+        LOOP DIGITS_SIZE
+        JUMP PRINT_INT_DIGITS_LOOP
 
-DIV64_TEMP_LOW: WORD 0x0
-DIV64_TEMP_HIGH: WORD 0x0
-DIV64_REM: WORD 0x0
-DIV64_BY_10:
+    CALL $PRINT_DOT_ISO8859
+
+    LD $FRAC_PART_2
+    ST $MUL32_NUM_LOW
+    LD $FRAC_PART_3
+    ST $MUL32_NUM_HIGH
+    CALL $MUL32_BY_1000
+    LD $MUL32_RES
+    ST $DIV32_NUM_LOW
     CLA
-    ST $DIV64_TEMP_HIGH
-    LD $INT_PART_3
-    ST $DIV64_TEMP_LOW
+    ST $DIV32_NUM_HIGH
+    CALL $DIV32_BY_10
+
+    STORE_FRAC_DIGITS_LOOP:
+        LD $DIV32_REM
+        ST (DIGITS_PTR)+
+        LD $DIGITS_SIZE
+        INC
+        ST $DIGITS_SIZE
+        LD $DIV32_QUOT
+        BZS PRINT_FRAC_DIGITS_LOOP
+        BLT PRINT_FRAC_DIGITS_LOOP
+        ST $DIV32_NUM_LOW
+        CLA
+        ST $DIV32_NUM_HIGH
+        CALL $DIV32_BY_10
+        JUMP STORE_FRAC_DIGITS_LOOP
     
+    PRINT_FRAC_DIGITS_LOOP:
+        LD -(DIGITS_PTR)
+        CALL $PRINT_DIGIT_ISO8859
+        LOOP DIGITS_SIZE
+        JUMP PRINT_FRAC_DIGITS_LOOP
+
+    CALL $PRINT_NEWLINE_ISO8859L
+    RET
+
+DIV32_NUM_LOW: WORD 0x0
+DIV32_NUM_HIGH: WORD 0x0
+DIV32_QUOT: WORD 0x0
+DIV32_REM: WORD 0x0
+DIV32_BY_10:
+    CLA
+    ST $DIV32_REM
+    ST $DIV32_QUOT
+    DIV32_LOOP_DIV:
+        LD DIV32_NUM_HIGH
+        CMP #0
+        BZS DIV32_CHECK_LOW
+        BGE DIV32_SUB
+
+        DIV32_CHECK_LOW:
+            LD DIV32_NUM_LOW
+            CMP #10
+            BLT DIV32_RETURN
+
+    DIV32_SUB:
+        LD $DIV32_NUM_LOW
+        ST $SUB32_A_LOW
+        LD $DIV32_NUM_HIGH
+        ST $SUB32_A_HIGH
+        LD #10
+        ST $SUB32_B_LOW
+        CLA
+        ST $SUB32_B_HIGH
+        CALL $SUB32
+        LD $SUB32_RES_LOW
+        ST $DIV32_NUM_LOW
+        LD $SUB32_RES_HIGH
+        ST $DIV32_NUM_HIGH
+        LD $DIV32_QUOT
+        INC
+        ST $DIV32_QUOT
+        JUMP DIV32_LOOP_DIV
+
+    DIV32_RETURN:
+        LD $DIV32_NUM_LOW
+        ST $DIV32_REM
+        RET
+    
+MUL32_NUM_LOW: WORD 0x0
+MUL32_NUM_HIGH: WORD 0x0
+MUL32_RES: WORD 0x0
+MUL32_BY_1000:
+    LD MUL32_NUM_HIGH
+    BZC MUL32_NOT_ZERO
+    CLA
+    ST MUL32_RES
+    RET
+    
+    MUL32_NOT_ZERO: 
+    LD #10
+    PUSH
+    MUL32_ASL:
+        LD $MUL32_NUM_LOW
+        ASL     ; AC15 -> C 
+        ST $MUL32_NUM_LOW
+        LD $MUL32_NUM_HIGH
+        ROL     ; C -> AC0
+        ST $MUL32_NUM_HIGH
+        LD $MUL32_RES
+        ROL
+        ST $MUL32_RES
+    LOOP &0
+    JUMP MUL32_ASL
+    SWAP
+    POP
+    RET
 
 PRINT_SIGN_ISO8859: ; void print_sign_iso8859(boolean sign)
     ASL             ; if ac = 0x1, then we have minus sign, which is 2 steps away from plus, so *2
@@ -702,9 +853,18 @@ PRINT_SIGN_ISO8859: ; void print_sign_iso8859(boolean sign)
     OUT 0xC
     RET
 
-
-PRINT_DIGIT_ISO8859: ; void print_digit_iso8859(int4 digit) 
-    ADD $ISO_SYMBOL_0; ac=digit in binary form, so add zero digit in iso8859 and get correct one
+PRINT_DOT_ISO8859:
+    LD #3
+    ADD $ISO_SYMBOL_PLUS
     OUT 0xC
     RET
 
+PRINT_DIGIT_ISO8859: ; void print_digit_iso8859(int4 digit) 
+    ADD $ISO_SYMBOL_ZERO; ac=digit in binary form, so add zero digit in iso8859 and get correct one
+    OUT 0xC
+    RET
+
+PRINT_NEWLINE_ISO8859L:
+    LD #10
+    OUT 0xC
+    RET
