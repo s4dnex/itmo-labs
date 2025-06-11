@@ -1,10 +1,10 @@
 ; first number
-NUM1_LOW: WORD 0x4396
-NUM1_HIGH: WORD 0x3f0b
+NUM1_LOW: WORD 0x1000
+NUM1_HIGH: WORD 0x4480
 
 ; second number
-NUM2_LOW: WORD 0xe979
-NUM2_HIGH: WORD 0x42f6
+NUM2_LOW: WORD 0x0
+NUM2_HIGH: WORD 0xC480
 
 NUM1_EXP: WORD 0x0
 NUM1_POW: WORD 0x0
@@ -179,10 +179,12 @@ FLOAT_SUM: ; void (float) sum()
         JUMP SUM_NORMALIZE
     
     COMPARE_MANTISES:
+        ; LD #11
+        ; HLT ; debug
         LD $NUM1_MANTIS_HIGH
         CMP $NUM2_MANTIS_HIGH
         BEQ COMPARE_LOWER_MANTISES
-        BLO NUM2_MANTIS_LARGER
+        BLT NUM2_MANTIS_LARGER
 
     NUM1_MANTIS_LARGER:
         ; LD #11
@@ -286,6 +288,7 @@ FLOAT_SUM: ; void (float) sum()
         ST $FLOAT_NUM_MANTIS_HIGH
         ST $FLOAT_NUM_SIGN
         ST $FLOAT_NUM_POW
+        BZS FLOAT_ASSEMBLE
     
     SUM_RETURN:
         LD $FLOAT_NUM_SIGN
@@ -306,7 +309,6 @@ FLOAT_SUM: ; void (float) sum()
             LD #7
             ST &0
             LD $FLOAT_NUM_POW
-            BZS FLOAT_ASSEMBLE
             ADD #127
             SUM_EXPONENT_SHIFT:
                 CLC
@@ -644,18 +646,19 @@ GET_FRACTION_PARTS: ; void (int64) get_fraction_part(pow, mantis_low, mantis_hig
         ST &3
         JUMP GFP_RETURN
     GFP_IF_LESS_THAN_0: 
+        ; HLT
         CMP #0 ; if (pow < 0)
         BGE GFP_BETWEEN_0_AND_23 ; jump to 0 <= pow < 23
 
         CMP #-65
-        BLO GFP_RETURN ; if (pow < -65) return because won't be able to store such value
+        BLT GFP_RETURN ; if (pow < -65) return because won't be able to store such value
 
 
         LD &5
         NEG
         ADD #-23
         ST &5
-
+        BLT GFP_RETURN
         GFP_ASR:
             CLC 
             LD &3
