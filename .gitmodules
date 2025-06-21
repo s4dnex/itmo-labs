@@ -4,3 +4,7 @@
 [submodule "programming/lab7"]
 	path = programming/lab7
 	url = https://github.com/s4dnex/prog-lab7.git
+[submodule "opd/lab6-dop"]
+	path = opd/lab6/dop
+	url = https://github.com/safarislava/Snake-RPI4.git
+	branch = interrupt-v2
