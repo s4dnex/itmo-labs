@@ -8,3 +8,6 @@
 	path = opd/lab6/dop
 	url = https://github.com/safarislava/Snake-RPI4.git
 	branch = interrupt-v2
+[submodule "web/lab1"]
+	path = web/lab1
+	url = https://github.com/s4dnex/web-lab1.git
