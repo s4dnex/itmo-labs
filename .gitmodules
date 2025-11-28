@@ -17,3 +17,6 @@
 [submodule "langs/lab1"]
 	path = langs/lab1
 	url = https://gitlab.se.ifmo.ru/sadnex/langs-lab1.git
+[submodule "web-lab3"]
+	path = web/lab3
+	url = https://github.com/s4dnex/web-lab3.git
