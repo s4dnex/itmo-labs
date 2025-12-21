@@ -3,12 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
 
-# 1. Загрузка данных
 df = pd.read_csv('../docs/stocks.csv', sep=';')
 prices = df['<CLOSE>'].values
-t = np.arange(len(prices))  # Временная ось в днях
+t = np.arange(len(prices))  # Временная шкала в днях
 
-# 2. Определение параметров фильтрации (в торговых днях)
+# Определение констант времени (в торговых днях)
 time_constants = {
     "1 день": 1,
     "1 неделя": 5,
@@ -17,28 +16,28 @@ time_constants = {
     "1 год": 252
 }
 
-plt.figure(figsize=(14, 8))
-plt.plot(t, prices, label='Исходные данные (SBER)', color='lightgray', alpha=0.7, lw=1)
-
+fig, axes = plt.subplots(nrows=len(time_constants), ncols=1, figsize=(12, 20))
+fig.subplots_adjust(hspace=0.4)
 colors = ['blue', 'green', 'orange', 'red', 'purple']
 
-# 3. Применение фильтра для каждого T
-for (label, T), color in zip(time_constants.items(), colors):
-    # W(p) = 1 / (Tp + 1)
+for i, ((label, T), color) in enumerate(zip(time_constants.items(), colors)):
+    # Настройка фильтра первого порядка W(p) = 1 / (Tp + 1)
     num = [1]
     den = [T, 1]
-    sys = signal.TransferFunction(num, den)
+    filter1 = signal.TransferFunction(num, den)
 
-    # Решение проблемы "старта из нуля":
-    # Задаем начальное состояние X0 равным первой цене.
-    tout, y, xout = signal.lsim(sys, U=prices, T=t, X0=[prices[0]])
+    # Решение проблемы старта из нуля (задание начального состояния X0)
+    # Устанавливаем выход фильтра в начальный момент равным первой цене
+    tout, y, x_out = signal.lsim(filter1, U=prices, T=t, X0=[prices[0]])
 
-    plt.plot(tout, y, label=f'T = {label}', color=color, lw=2)
+    ax = axes[i]
+    ax.plot(t, prices, label='Оригинал', color='black', alpha=0.8, lw=1)
+    ax.plot(tout, y, label=f'Сглаживание (T = {label})', color=color, lw=2)
 
-# Оформление графика
-plt.title('Сглаживание котировок акций Сбербанка (Линейная фильтрация 1-го порядка)', fontsize=14)
-plt.xlabel('Торговые дни (с 04.01.2021)', fontsize=12)
-plt.ylabel('Цена закрытия (руб.)', fontsize=12)
-plt.legend()
-plt.grid(True, which='both', linestyle='--', alpha=0.5)
+    ax.set_title(f'Сглаживание котировок акций Сбербанка: {label}', fontsize=12, fontweight='bold')
+    ax.set_ylabel('Цена (руб.)')
+    ax.set_xlabel('Торговые дни (от 01.01.2021 по 21.12.2025)')
+    ax.legend(loc='upper left')
+    ax.grid(True, linestyle=':', alpha=0.6)
+
 plt.show()
