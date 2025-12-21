@@ -24,19 +24,20 @@ u = g + b*xi + c*np.sin(d*t) # Зашумленная версия g(t)
 # 1.1 Фильтр первого порядка
 c = 0
 T_const = 3.0
+# Определение фильтра 1-го порядка W(p) = 1 / (T*p + 1)
 num = [1]
 den = [T_const, 1]
 filter1 = signal.TransferFunction(num, den)
 
-t_sim = t - t[0] # сдвигаем в [0, 100]
-# Симулируем, используя t_sim, но подаем тот же сигнал u
-tout, g_filtered, _ = signal.lsim(filter1, u, t_sim)
+t_sim = t - t[0] # сдвигаем в [0, 100], чтобы не вылетала ошибка (ограничение библиотеки)
+# Пропускание сигнала u через фильтр
+tout, u_filtered, _ = signal.lsim(filter1, u, t_sim)
 
 # Используем угловую частоту omega (рад/с)
 W = fftshift(fftfreq(len(t), dt)) * 2 * np.pi
 U_fft = fftshift(fft(u)) * dt
 G_orig_fft = fftshift(fft(g)) * dt
-G_filt_fft = fftshift(fft(g_filtered)) * dt
+G_filt_fft = fftshift(fft(u_filtered)) * dt
 
 # АЧХ фильтра теоретическая: |W(iw)| = 1 / sqrt(1 + (wT)^2)
 frc = 1 / np.sqrt(1 + (W * T_const)**2)
@@ -46,7 +47,7 @@ plt.figure(figsize=(12, 8))
 plt.subplot(2, 1, 1)
 plt.plot(t, u, alpha=0.5, label='Зашумленный u(t)')
 plt.plot(t, g, 'k--', label='Исходный g(t)')
-plt.plot(t, g_filtered, 'r', lw=2, label=f'Отфильтрованный (T={T_const})')
+plt.plot(t, u_filtered, 'r', lw=2, label=f'Отфильтрованный (T={T_const})')
 plt.title('Сигнал во временной области')
 plt.legend(); plt.grid()
 
