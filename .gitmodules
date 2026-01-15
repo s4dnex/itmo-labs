@@ -20,3 +20,6 @@
 [submodule "web-lab3"]
 	path = web/lab3
 	url = https://github.com/s4dnex/web-lab3.git
+[submodule "web-lab4-front"]
+	path = web/lab4-front
+	url = https://github.com/s4dnex/web-lab4-front
