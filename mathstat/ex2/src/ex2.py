@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 # ЗАДАНИЕ: Первичная обработка выборки
 # -------------------------------------------------
 # ШАГ 0: Загрузите свою выборку (замените номер файла на ваш вариант)
-data = np.loadtxt('variant_7.csv', delimiter=',')
+data = np.loadtxt('../data/variant_7.csv', delimiter=',')
 
 print(f"Объём выборки: n = {len(data)}")
 print()
