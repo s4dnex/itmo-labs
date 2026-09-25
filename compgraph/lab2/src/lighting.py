@@ -25,6 +25,12 @@ class Vector:
         """Скалярное произведение векторов."""
         return self.x * other.x + self.y * other.y + self.z * other.z
 
+    def cross(self, other: "Vector") -> "Vector":
+        """Векторное произведение векторов."""
+        return Vector(self.y * other.z - self.z * other.y,
+                      self.z * other.x - self.x * other.z,
+                      self.x * other.y - self.y * other.x)
+
     def length(self) -> float:
         """Длина вектора."""
         return math.sqrt(self.dot(self))
@@ -38,6 +44,47 @@ class LightSource:
     def __init__(self, x: float, y: float, z: float, intensity: float):
         self.position = Vector(x, y, z)  # мм
         self.intensity = intensity  # I0, Вт/ср, сила излучения вдоль оси (theta = 0)
+
+
+class Camera:
+    """
+    Наблюдатель с экраном. Экран - прямоугольник, перпендикулярный направлению взгляда,
+    его центр лежит на оси взгляда на расстоянии screen_distance от наблюдателя.
+
+    yaw   - азимут, угол поворота вокруг оси Z от оси +Y по часовой стрелке (к оси +X), градусы
+    pitch - угол наклона от горизонтальной плоскости (-90 - вниз по оси Z, 90 - вверх), градусы
+    """
+
+    def __init__(self, position: Vector, yaw: float, pitch: float, screen_distance: float):
+        self.position = position
+        self.yaw = yaw
+        self.pitch = pitch
+        self.screen_distance = screen_distance  # мм
+
+        yaw_rad = math.radians(yaw)
+        pitch_rad = math.radians(pitch)
+        # направление взгляда
+        self.forward = Vector(math.cos(pitch_rad) * math.sin(yaw_rad),
+                              math.cos(pitch_rad) * math.cos(yaw_rad),
+                              math.sin(pitch_rad))
+        # "вправо" на экране всегда горизонтально, поэтому базис определен и при pitch = +-90
+        self.right = Vector(math.cos(yaw_rad), -math.sin(yaw_rad), 0.0)
+        # "вверх" на экране
+        self.up = self.right.cross(self.forward)
+
+    def screen_point(self, u: float, v: float) -> Vector:
+        """Точка экрана с экранными координатами (u, v), мм, в мировой системе координат."""
+        return (self.position + self.forward * self.screen_distance
+                + self.right * u + self.up * v)
+
+
+def look_at_angles(viewer: Vector, target: Vector) -> tuple[float, float]:
+    """Углы (yaw, pitch) в градусах, при которых наблюдатель смотрит на точку target."""
+    direction = target - viewer
+    horizontal = math.hypot(direction.x, direction.y)
+    yaw = math.degrees(math.atan2(direction.x, direction.y))
+    pitch = math.degrees(math.atan2(direction.z, horizontal))
+    return yaw, pitch
 
 
 def calculate_luminance(point: Vector,
@@ -132,7 +179,7 @@ def find_intersection(viewer: Vector,
 def render(width: float,
            height: float,
            width_resolution: int,
-           viewer: Vector,
+           camera: Camera,
            center: Vector,
            radius: float,
            lights: list[LightSource],
@@ -140,7 +187,7 @@ def render(width: float,
            specular_coef: float,
            shininess: float) -> tuple[list[list[float]], list[list[Vector | None]], float]:
     """
-    Экран лежит в плоскости z = 0, его центр в начале координат.
+    Экран перпендикулярен направлению взгляда камеры, его центр лежит на оси взгляда.
     Через центр каждого пикселя из точки наблюдателя проводится луч,
     ищется его первое пересечение со сферой и в этой точке считается яркость.
 
@@ -149,6 +196,7 @@ def render(width: float,
       sphere_points - точка сферы для каждого пикселя (None там, где сферы нет),
       height_real   - реальная высота экрана, кратная размеру пикселя.
     """
+    viewer = camera.position
     pixel_size = width / width_resolution
     height_resolution = int(round(height / pixel_size))
     height_real = height_resolution * pixel_size
@@ -161,10 +209,10 @@ def render(width: float,
         points_row: list[Vector | None] = []
 
         for col in range(width_resolution):
-            # центр пикселя на экране (строка 0 - верх изображения)
-            pixel_x = -width / 2 + (col + 0.5) * pixel_size
-            pixel_y = height_real / 2 - (row + 0.5) * pixel_size
-            pixel = Vector(pixel_x, pixel_y, 0.0)
+            # центр пикселя в экранных координатах (строка 0 - верх изображения)
+            pixel_u = -width / 2 + (col + 0.5) * pixel_size
+            pixel_v = height_real / 2 - (row + 0.5) * pixel_size
+            pixel = camera.screen_point(pixel_u, pixel_v)
 
             direction = pixel - viewer
             point = find_intersection(viewer, direction, center, radius)

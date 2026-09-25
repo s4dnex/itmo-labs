@@ -7,7 +7,7 @@ from PIL import Image
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-from lighting import Vector, LightSource, calculate_luminance, render, to_image
+from lighting import Vector, LightSource, Camera, calculate_luminance, look_at_angles, render, to_image
 
 IMG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "img")
 
@@ -94,7 +94,13 @@ class App:
         self.add_section("Наблюдатель")
         self.add_scale("viewer_x", "x0, мм", -10000, 10000, 0)
         self.add_scale("viewer_y", "y0, мм", -10000, 10000, 0)
-        self.add_scale("viewer_z", "z0, мм", 100, 10000, 6000)
+        self.add_scale("viewer_z", "z0, мм", -10000, 10000, 6000)
+        self.add_scale("yaw", "азимут, °", -180, 180, 0, resolution=1)
+        self.add_scale("pitch", "наклон, °", -90, 90, -90, resolution=1)
+        self.add_entry("screen_distance", "Расстояние до экрана, мм", "6000")
+        self.look_at_sphere = tk.BooleanVar(value=False)
+        tk.Checkbutton(self.left_frame, text="смотреть на центр сферы", variable=self.look_at_sphere,
+                       command=self.on_look_at_toggle).pack(anchor="w")
 
         buttons_frame = tk.Frame(self.left_frame)
         buttons_frame.pack(fill=tk.X, pady=6)
@@ -110,7 +116,7 @@ class App:
         self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 
         # область для вывода численных результатов
-        self.info_text = tk.Text(self.right_frame, height=13, width=80, font=("Consolas", 9))
+        self.info_text = tk.Text(self.right_frame, height=14, width=80, font=("Consolas", 9))
         self.info_text.pack(fill=tk.X)
 
     def add_section(self, title: str) -> None:
@@ -127,17 +133,33 @@ class App:
         entry.bind("<Return>", lambda event: self.calculate())
         self.entries[key] = entry
 
-    def add_scale(self, key: str, text: str, min_value: int, max_value: int, default: int) -> None:
+    def add_scale(self, key: str, text: str, min_value: int, max_value: int, default: int,
+                  resolution: int = 50) -> None:
         row = tk.Frame(self.left_frame)
         row.pack(fill=tk.X)
-        tk.Label(row, text=text, width=8, anchor="w").pack(side=tk.LEFT)
-        scale = tk.Scale(row, from_=min_value, to=max_value, resolution=50, orient=tk.HORIZONTAL,
+        tk.Label(row, text=text, width=10, anchor="w").pack(side=tk.LEFT)
+        scale = tk.Scale(row, from_=min_value, to=max_value, resolution=resolution, orient=tk.HORIZONTAL,
                          length=200)
         scale.set(default)
         # пересчитываем, только когда ползунок отпущен
         scale.bind("<ButtonRelease-1>", lambda event: self.calculate())
         scale.pack(side=tk.LEFT)
         self.viewer_scales[key] = scale
+
+    def on_look_at_toggle(self) -> None:
+        # в режиме слежения за сферой углы вычисляются автоматически
+        state = tk.DISABLED if self.look_at_sphere.get() else tk.NORMAL
+        self.viewer_scales["yaw"].config(state=state)
+        self.viewer_scales["pitch"].config(state=state)
+        self.calculate()
+
+    def set_scale(self, key: str, value: float) -> None:
+        # выключенный ползунок игнорирует set, поэтому временно включаем его
+        scale = self.viewer_scales[key]
+        state = scale.cget("state")
+        scale.config(state=tk.NORMAL)
+        scale.set(round(value))
+        scale.config(state=state)
 
     def get_float(self, key: str) -> float:
         return float(self.entries[key].get().replace(",", "."))
@@ -161,6 +183,9 @@ class App:
             viewer = Vector(float(self.viewer_scales["viewer_x"].get()),
                             float(self.viewer_scales["viewer_y"].get()),
                             float(self.viewer_scales["viewer_z"].get()))
+            yaw = float(self.viewer_scales["yaw"].get())
+            pitch = float(self.viewer_scales["pitch"].get())
+            screen_distance = self.get_float("screen_distance")
 
             light1 = LightSource(self.get_float("light1_x"), self.get_float("light1_y"),
                                  self.get_float("light1_z"), self.get_float("light1_intensity"))
@@ -177,9 +202,19 @@ class App:
             lights.append(light2)
 
         # проверки параметров
-        if width <= 0 or height <= 0 or radius <= 0:
-            self.show_info("Ошибка: ширина, высота и радиус должны быть положительными", "red")
+        if width <= 0 or height <= 0 or radius <= 0 or screen_distance <= 0:
+            self.show_info("Ошибка: ширина, высота, радиус и расстояние до экрана "
+                           "должны быть положительными", "red")
             return
+        if (viewer - center).length() <= radius:
+            self.show_info("Ошибка: наблюдатель находится внутри сферы", "red")
+            return
+
+        if self.look_at_sphere.get():
+            yaw, pitch = look_at_angles(viewer, center)
+            self.set_scale("yaw", yaw)
+            self.set_scale("pitch", pitch)
+        camera = Camera(viewer, yaw, pitch, screen_distance)
         if width_resolution <= 0:
             self.show_info("Ошибка: разрешение должно быть положительным", "red")
             return
@@ -214,7 +249,7 @@ class App:
         self.show_info("Идет расчет...")
         self.root.update_idletasks()  # чтобы надпись появилась до начала долгого расчета
         luminance, sphere_points, height_real = render(
-            width, height, width_resolution, viewer, center, radius, lights,
+            width, height, width_resolution, camera, center, radius, lights,
             diffuse_coef, specular_coef, shininess)
 
         # поиск максимальной и минимальной яркости среди пикселей сферы
@@ -236,6 +271,9 @@ class App:
 
         text = (f"Разрешение: {width_resolution} x {height_resolution}, "
                 f"размер пикселя {pixel_size:.2f} мм\n")
+        forward = camera.forward
+        text += (f"Камера: азимут {yaw:.1f}°, наклон {pitch:.1f}°, "
+                 f"направление взгляда ({forward.x:.3f}, {forward.y:.3f}, {forward.z:.3f})\n")
         if max_point is not None and min_point is not None:
             text += f"Максимальная яркость: {max_luminance:.4f} Вт/(м²·ср) в точке {format_point(max_point)}\n"
             text += f"Минимальная яркость:  {min_luminance:.4f} Вт/(м²·ср) в точке {format_point(min_point)}\n"
@@ -267,9 +305,36 @@ class App:
         self.axes.imshow(image, cmap="gray", vmin=0, vmax=255,
                          extent=(-width / 2, width / 2, -height_real / 2, height_real / 2))
         self.axes.set_title("Распределение яркости (0-255)")
-        self.axes.set_xlabel("X, мм")
-        self.axes.set_ylabel("Y, мм")
+        # оси графика - координаты на экране камеры, а не мировые X и Y
+        self.axes.set_xlabel("u (вправо по экрану), мм")
+        self.axes.set_ylabel("v (вверх по экрану), мм")
+        self.draw_world_axes(camera)
         self.canvas.draw()
+
+    def draw_world_axes(self, camera: Camera) -> None:
+        """Значок ориентации: проекции мировых осей X, Y, Z на плоскость экрана."""
+        origin = (0.12, 0.12)  # в долях области графика
+        arrow_length = 0.08
+        world_axes = [("X", Vector(1.0, 0.0, 0.0), "red"),
+                      ("Y", Vector(0.0, 1.0, 0.0), "lime"),
+                      ("Z", Vector(0.0, 0.0, 1.0), "deepskyblue")]
+        for name, axis, color in world_axes:
+            du = axis.dot(camera.right)
+            dv = axis.dot(camera.up)
+            if math.hypot(du, dv) < 0.05:
+                # ось почти параллельна взгляду: точка - ось направлена на нас, крестик - от нас
+                marker = "o" if axis.dot(camera.forward) < 0 else "x"
+                self.axes.plot(*origin, marker=marker, color=color, markersize=6,
+                               transform=self.axes.transAxes)
+                self.axes.annotate(name, xy=origin, xycoords="axes fraction", color=color,
+                                   xytext=(6, 6), textcoords="offset points")
+                continue
+            end = (origin[0] + du * arrow_length, origin[1] + dv * arrow_length)
+            self.axes.annotate("", xy=end, xytext=origin, xycoords="axes fraction",
+                               arrowprops=dict(arrowstyle="->", color=color, lw=1.5))
+            self.axes.annotate(name, xy=end, xycoords="axes fraction", color=color,
+                               ha="center", va="center",
+                               xytext=(du * 8, dv * 8), textcoords="offset points")
 
     def save_image(self) -> None:
         if self.last_image is None:
