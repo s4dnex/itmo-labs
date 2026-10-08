@@ -73,9 +73,9 @@ class App:
         self.add_entry("radius", "Радиус R, мм", "800")
 
         self.add_section("Источник 1")
-        self.add_entry("light1_x", "X, мм", "-10000")
-        self.add_entry("light1_y", "Y, мм", "10000")
-        self.add_entry("light1_z", "Z, мм", "4000")
+        self.add_entry("light1_x", "X, мм", "-4000")
+        self.add_entry("light1_y", "Y, мм", "4000")
+        self.add_entry("light1_z", "Z, мм", "8000")
         self.add_entry("light1_intensity", "I0, Вт/ср", "2000")
         self.add_vector_entry("light1_dir", "Направление (x, y, z)", ("0", "0", "-1"))
         self.light1_enabled = tk.BooleanVar(value=True)
@@ -83,9 +83,9 @@ class App:
                        command=self.calculate).pack(anchor="w")
 
         self.add_section("Источник 2")
-        self.add_entry("light2_x", "X, мм", "10000")
-        self.add_entry("light2_y", "Y, мм", "-10000")
-        self.add_entry("light2_z", "Z, мм", "2000")
+        self.add_entry("light2_x", "X, мм", "4000")
+        self.add_entry("light2_y", "Y, мм", "-4000")
+        self.add_entry("light2_z", "Z, мм", "7000")
         self.add_entry("light2_intensity", "I0, Вт/ср", "3000")
         self.add_vector_entry("light2_dir", "Направление (x, y, z)", ("0", "0", "-1"))
         self.light2_enabled = tk.BooleanVar(value=True)
@@ -101,8 +101,8 @@ class App:
         self.add_entry("viewer_x", "x0, мм", "0")
         self.add_entry("viewer_y", "y0, мм", "0")
         self.add_entry("viewer_z", "z0, мм", "6000")
-        self.add_entry("yaw", "Азимут, °", "0")
-        self.add_entry("pitch", "Наклон, °", "-90")
+        self.add_entry("yaw", "Поворот по горизонтали, °", "0")
+        self.add_entry("pitch", "Наклон по вертикали, °", "-90")
         self.add_entry("screen_distance", "Расстояние до экрана, мм", "6000")
         self.look_at_sphere = tk.BooleanVar(value=False)
         tk.Checkbutton(self.left_frame, text="смотреть на центр сферы", variable=self.look_at_sphere,
@@ -134,7 +134,7 @@ class App:
     def add_entry(self, key: str, text: str, default: str) -> None:
         row = tk.Frame(self.left_frame)
         row.pack(fill=tk.X)
-        tk.Label(row, text=text, width=24, anchor="w").pack(side=tk.LEFT)
+        tk.Label(row, text=text, width=26, anchor="w").pack(side=tk.LEFT)
         self.make_entry(row, key, default, 10).pack(side=tk.LEFT)
 
     def make_entry(self, parent: tk.Frame, key: str, default: str, width: int) -> tk.Entry:
@@ -150,7 +150,7 @@ class App:
     def add_vector_entry(self, key: str, text: str, defaults: tuple[str, str, str]) -> None:
         row = tk.Frame(self.left_frame)
         row.pack(fill=tk.X)
-        tk.Label(row, text=text, width=24, anchor="w").pack(side=tk.LEFT)
+        tk.Label(row, text=text, width=26, anchor="w").pack(side=tk.LEFT)
         for axis, default in zip("xyz", defaults):
             self.make_entry(row, f"{key}_{axis}", default, 5).pack(side=tk.LEFT, padx=(0, 2))
 
@@ -276,7 +276,7 @@ class App:
         check_range(warnings, "xC", center.x, -10000, 10000)
         check_range(warnings, "yC", center.y, -10000, 10000)
         check_range(warnings, "zC", center.z, 100, 10000)
-        check_range(warnings, "Наклон камеры", pitch, -90, 90)
+        check_range(warnings, "Наклон камеры по вертикали", pitch, -90, 90)
         for number, light in enumerate([light1, light2], start=1):
             check_range(warnings, f"xL{number}", light.position.x, -10000, 10000)
             check_range(warnings, f"yL{number}", light.position.y, -10000, 10000)
@@ -312,8 +312,8 @@ class App:
         text = (f"Разрешение: {width_resolution} x {height_resolution}, "
                 f"размер пикселя {pixel_size:.2f} мм\n")
         forward = camera.forward
-        text += (f"Камера: азимут {yaw:.1f}°, наклон {pitch:.1f}°, "
-                 f"направление взгляда ({forward.x:.3f}, {forward.y:.3f}, {forward.z:.3f})\n")
+        text += f"Камера: поворот по горизонтали {yaw:.1f}°, наклон по вертикали {pitch:.1f}°\n"
+        text += f"Направление взгляда: ({forward.x:.3f}, {forward.y:.3f}, {forward.z:.3f})\n"
         if max_point is not None and min_point is not None:
             text += f"Максимальная яркость: {max_luminance:.4f} Вт/(м²·ср) в точке {format_point(max_point)}\n"
             text += f"Минимальная яркость:  {min_luminance:.4f} Вт/(м²·ср) в точке {format_point(min_point)}\n"
