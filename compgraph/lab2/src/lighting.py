@@ -41,9 +41,11 @@ class Vector:
 
 
 class LightSource:
-    def __init__(self, x: float, y: float, z: float, intensity: float):
+    def __init__(self, x: float, y: float, z: float, intensity: float,
+                 direction: Vector = Vector(0.0, 0.0, -1.0)):
         self.position = Vector(x, y, z)  # мм
         self.intensity = intensity  # I0, Вт/ср, сила излучения вдоль оси (theta = 0)
+        self.direction = direction.normalize()  # ось диаграммы излучения (O), единичный вектор
 
 
 class Camera:
@@ -109,16 +111,13 @@ def calculate_luminance(point: Vector,
     # единичный вектор от точки к наблюдателю (v)
     to_viewer = (viewer - point).normalize()
 
-    # ось диаграммы излучения источника направлена вниз, против оси Z
-    light_axis = Vector(0.0, 0.0, -1.0)
-
     for light in lights:
         # s - вектор от источника к точке: s = P - P_L
         light_to_point = point - light.position
         distance = light_to_point.length()  # мм
 
         # сила излучения в направлении точки: I = I0 * cos(theta)
-        cos_theta = light_to_point.dot(light_axis) / distance
+        cos_theta = light_to_point.dot(light.direction) / distance
         if cos_theta <= 0:
             continue  # назад источник не светит
         intensity = light.intensity * cos_theta

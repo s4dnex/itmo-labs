@@ -73,6 +73,7 @@ class App:
         self.add_entry("light1_y", "Y, мм", "10000")
         self.add_entry("light1_z", "Z, мм", "4000")
         self.add_entry("light1_intensity", "I0, Вт/ср", "2000")
+        self.add_vector_entry("light1_dir", "Направление (x, y, z)", ("0", "0", "-1"))
         self.light1_enabled = tk.BooleanVar(value=True)
         tk.Checkbutton(self.left_frame, text="включен", variable=self.light1_enabled,
                        command=self.calculate).pack(anchor="w")
@@ -82,6 +83,7 @@ class App:
         self.add_entry("light2_y", "Y, мм", "-10000")
         self.add_entry("light2_z", "Z, мм", "2000")
         self.add_entry("light2_intensity", "I0, Вт/ср", "3000")
+        self.add_vector_entry("light2_dir", "Направление (x, y, z)", ("0", "0", "-1"))
         self.light2_enabled = tk.BooleanVar(value=True)
         tk.Checkbutton(self.left_frame, text="включен", variable=self.light2_enabled,
                        command=self.calculate).pack(anchor="w")
@@ -132,6 +134,21 @@ class App:
         entry.pack(side=tk.LEFT)
         entry.bind("<Return>", lambda event: self.calculate())
         self.entries[key] = entry
+
+    def add_vector_entry(self, key: str, text: str, defaults: tuple[str, str, str]) -> None:
+        """Три поля в одной строке: key_x, key_y, key_z."""
+        row = tk.Frame(self.left_frame)
+        row.pack(fill=tk.X)
+        tk.Label(row, text=text, width=24, anchor="w").pack(side=tk.LEFT)
+        for axis, default in zip("xyz", defaults):
+            entry = tk.Entry(row, width=5)
+            entry.insert(0, default)
+            entry.pack(side=tk.LEFT, padx=(0, 2))
+            entry.bind("<Return>", lambda event: self.calculate())
+            self.entries[f"{key}_{axis}"] = entry
+
+    def get_vector(self, key: str) -> Vector:
+        return Vector(self.get_float(f"{key}_x"), self.get_float(f"{key}_y"), self.get_float(f"{key}_z"))
 
     def add_scale(self, key: str, text: str, min_value: int, max_value: int, default: int,
                   resolution: int = 50) -> None:
@@ -187,13 +204,18 @@ class App:
             pitch = float(self.viewer_scales["pitch"].get())
             screen_distance = self.get_float("screen_distance")
 
-            light1 = LightSource(self.get_float("light1_x"), self.get_float("light1_y"),
-                                 self.get_float("light1_z"), self.get_float("light1_intensity"))
-            light2 = LightSource(self.get_float("light2_x"), self.get_float("light2_y"),
-                                 self.get_float("light2_z"), self.get_float("light2_intensity"))
+            light_params = [(self.get_vector(f"light{number}"),
+                             self.get_float(f"light{number}_intensity"),
+                             self.get_vector(f"light{number}_dir")) for number in (1, 2)]
         except ValueError:
             self.show_info("Ошибка: все параметры должны быть числами", "red")
             return
+
+        if any(direction.length() == 0 for _, _, direction in light_params):
+            self.show_info("Ошибка: вектор направления источника не может быть нулевым", "red")
+            return
+        light1, light2 = [LightSource(position.x, position.y, position.z, intensity, direction)
+                          for position, intensity, direction in light_params]
 
         lights: list[LightSource] = []
         if self.light1_enabled.get():
