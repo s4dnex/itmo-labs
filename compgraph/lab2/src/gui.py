@@ -10,6 +10,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from lighting import Vector, LightSource, Camera, calculate_luminance, look_at_angles, render, to_image
 
 IMG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "img")
+AUTO_CALCULATE_DELAY_MS = 700  # пауза после ввода, после которой запускается пересчет
 
 
 def check_range(warnings: list[str], name: str, value: float, low: float, high: float) -> None:
@@ -43,7 +44,10 @@ class App:
     def __init__(self) -> None:
         self.last_image: list[list[int]] | None = None  # последнее изображение для сохранения
         self.entries: dict[str, tk.Entry] = {}
-        self.viewer_scales: dict[str, tk.Scale] = {}
+        self.entry_vars: list[tk.StringVar] = []  # ссылки на переменные полей
+        self.defaults: dict[str, str] = {}  # значения по умолчанию
+        self.pending_calculation: str | None = None  # отложенный пересчет
+        self.updating_fields = False  # поля, которым пересчет не нужен
 
         self.root = tk.Tk()
         self.root.title("ЛР 2. Яркость на сфере от точечных источников света")
@@ -94,11 +98,11 @@ class App:
         self.add_entry("shininess", "ke (блеск)", "40")
 
         self.add_section("Наблюдатель")
-        self.add_scale("viewer_x", "x0, мм", -10000, 10000, 0)
-        self.add_scale("viewer_y", "y0, мм", -10000, 10000, 0)
-        self.add_scale("viewer_z", "z0, мм", -10000, 10000, 6000)
-        self.add_scale("yaw", "азимут, °", -180, 180, 0, resolution=1)
-        self.add_scale("pitch", "наклон, °", -90, 90, -90, resolution=1)
+        self.add_entry("viewer_x", "x0, мм", "0")
+        self.add_entry("viewer_y", "y0, мм", "0")
+        self.add_entry("viewer_z", "z0, мм", "6000")
+        self.add_entry("yaw", "Азимут, °", "0")
+        self.add_entry("pitch", "Наклон, °", "-90")
         self.add_entry("screen_distance", "Расстояние до экрана, мм", "6000")
         self.look_at_sphere = tk.BooleanVar(value=False)
         tk.Checkbutton(self.left_frame, text="смотреть на центр сферы", variable=self.look_at_sphere,
@@ -110,10 +114,12 @@ class App:
                   command=self.calculate).pack(side=tk.LEFT, padx=2)
         tk.Button(buttons_frame, text="Сохранить изображение",
                   command=self.save_image).pack(side=tk.LEFT, padx=2)
+        tk.Button(buttons_frame, text="Сбросить",
+                  command=self.reset).pack(side=tk.LEFT, padx=2)
 
         # область для вывода изображения
-        self.figure = Figure(figsize=(6, 6))
-        self.axes = self.figure.add_subplot(111)
+        self.figure = Figure(figsize=(6, 6), facecolor="black")
+        self.axes = self.figure.add_axes((0.0, 0.0, 1.0, 1.0))
         self.canvas = FigureCanvasTkAgg(self.figure, master=self.right_frame)
         self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 
@@ -129,54 +135,63 @@ class App:
         row = tk.Frame(self.left_frame)
         row.pack(fill=tk.X)
         tk.Label(row, text=text, width=24, anchor="w").pack(side=tk.LEFT)
-        entry = tk.Entry(row, width=10)
-        entry.insert(0, default)
-        entry.pack(side=tk.LEFT)
+        self.make_entry(row, key, default, 10).pack(side=tk.LEFT)
+
+    def make_entry(self, parent: tk.Frame, key: str, default: str, width: int) -> tk.Entry:
+        var = tk.StringVar(value=default)
+        var.trace_add("write", lambda *args: self.schedule_calculate())
+        entry = tk.Entry(parent, width=width, textvariable=var)
         entry.bind("<Return>", lambda event: self.calculate())
+        self.entry_vars.append(var)
         self.entries[key] = entry
+        self.defaults[key] = default
+        return entry
 
     def add_vector_entry(self, key: str, text: str, defaults: tuple[str, str, str]) -> None:
-        """Три поля в одной строке: key_x, key_y, key_z."""
         row = tk.Frame(self.left_frame)
         row.pack(fill=tk.X)
         tk.Label(row, text=text, width=24, anchor="w").pack(side=tk.LEFT)
         for axis, default in zip("xyz", defaults):
-            entry = tk.Entry(row, width=5)
-            entry.insert(0, default)
-            entry.pack(side=tk.LEFT, padx=(0, 2))
-            entry.bind("<Return>", lambda event: self.calculate())
-            self.entries[f"{key}_{axis}"] = entry
+            self.make_entry(row, f"{key}_{axis}", default, 5).pack(side=tk.LEFT, padx=(0, 2))
 
     def get_vector(self, key: str) -> Vector:
         return Vector(self.get_float(f"{key}_x"), self.get_float(f"{key}_y"), self.get_float(f"{key}_z"))
 
-    def add_scale(self, key: str, text: str, min_value: int, max_value: int, default: int,
-                  resolution: int = 50) -> None:
-        row = tk.Frame(self.left_frame)
-        row.pack(fill=tk.X)
-        tk.Label(row, text=text, width=10, anchor="w").pack(side=tk.LEFT)
-        scale = tk.Scale(row, from_=min_value, to=max_value, resolution=resolution, orient=tk.HORIZONTAL,
-                         length=200)
-        scale.set(default)
-        # пересчитываем, только когда ползунок отпущен
-        scale.bind("<ButtonRelease-1>", lambda event: self.calculate())
-        scale.pack(side=tk.LEFT)
-        self.viewer_scales[key] = scale
+    def schedule_calculate(self) -> None:
+        if self.updating_fields:
+            return
+        if self.pending_calculation is not None:
+            self.root.after_cancel(self.pending_calculation)
+        self.pending_calculation = self.root.after(AUTO_CALCULATE_DELAY_MS, self.calculate)
+
+    def set_entry(self, key: str, value: str) -> None:
+        entry = self.entries[key]
+        state = entry.cget("state")
+        self.updating_fields = True
+        entry.config(state=tk.NORMAL)
+        entry.delete(0, tk.END)
+        entry.insert(0, value)
+        entry.config(state=state)
+        self.updating_fields = False
+
+    def update_angle_entries_state(self) -> None:
+        # в режиме слежения за сферой углы вычисляются автоматически и вручную не меняются
+        state = tk.DISABLED if self.look_at_sphere.get() else tk.NORMAL
+        self.entries["yaw"].config(state=state)
+        self.entries["pitch"].config(state=state)
 
     def on_look_at_toggle(self) -> None:
-        # в режиме слежения за сферой углы вычисляются автоматически
-        state = tk.DISABLED if self.look_at_sphere.get() else tk.NORMAL
-        self.viewer_scales["yaw"].config(state=state)
-        self.viewer_scales["pitch"].config(state=state)
+        self.update_angle_entries_state()
         self.calculate()
 
-    def set_scale(self, key: str, value: float) -> None:
-        # выключенный ползунок игнорирует set, поэтому временно включаем его
-        scale = self.viewer_scales[key]
-        state = scale.cget("state")
-        scale.config(state=tk.NORMAL)
-        scale.set(round(value))
-        scale.config(state=state)
+    def reset(self) -> None:
+        self.light1_enabled.set(True)
+        self.light2_enabled.set(True)
+        self.look_at_sphere.set(False)
+        self.update_angle_entries_state()
+        for key in self.entries:
+            self.set_entry(key, self.defaults[key])
+        self.calculate()
 
     def get_float(self, key: str) -> float:
         return float(self.entries[key].get().replace(",", "."))
@@ -188,6 +203,10 @@ class App:
         self.info_text.config(state=tk.DISABLED, fg=color)
 
     def calculate(self) -> None:
+        if self.pending_calculation is not None:
+            self.root.after_cancel(self.pending_calculation)
+            self.pending_calculation = None
+
         try:
             width = self.get_float("width")
             height = self.get_float("height")
@@ -197,11 +216,9 @@ class App:
             diffuse_coef = self.get_float("diffuse_coef")
             specular_coef = self.get_float("specular_coef")
             shininess = self.get_float("shininess")
-            viewer = Vector(float(self.viewer_scales["viewer_x"].get()),
-                            float(self.viewer_scales["viewer_y"].get()),
-                            float(self.viewer_scales["viewer_z"].get()))
-            yaw = float(self.viewer_scales["yaw"].get())
-            pitch = float(self.viewer_scales["pitch"].get())
+            viewer = self.get_vector("viewer")
+            yaw = self.get_float("yaw")
+            pitch = self.get_float("pitch")
             screen_distance = self.get_float("screen_distance")
 
             light_params = [(self.get_vector(f"light{number}"),
@@ -234,8 +251,8 @@ class App:
 
         if self.look_at_sphere.get():
             yaw, pitch = look_at_angles(viewer, center)
-            self.set_scale("yaw", yaw)
-            self.set_scale("pitch", pitch)
+            self.set_entry("yaw", f"{yaw:.1f}")
+            self.set_entry("pitch", f"{pitch:.1f}")
         camera = Camera(viewer, yaw, pitch, screen_distance)
         if width_resolution <= 0:
             self.show_info("Ошибка: разрешение должно быть положительным", "red")
@@ -259,6 +276,7 @@ class App:
         check_range(warnings, "xC", center.x, -10000, 10000)
         check_range(warnings, "yC", center.y, -10000, 10000)
         check_range(warnings, "zC", center.z, 100, 10000)
+        check_range(warnings, "Наклон камеры", pitch, -90, 90)
         for number, light in enumerate([light1, light2], start=1):
             check_range(warnings, f"xL{number}", light.position.x, -10000, 10000)
             check_range(warnings, f"yL{number}", light.position.y, -10000, 10000)
@@ -302,7 +320,7 @@ class App:
         else:
             text += "Сфера не попадает на экран\n"
 
-        # нормировка на максимальное значение (0-255)
+        # нормировка на максимальное значение
         image = to_image(luminance, max_luminance)
 
         # яркость в трех точках сферы
@@ -326,16 +344,12 @@ class App:
         self.axes.clear()
         self.axes.imshow(image, cmap="gray", vmin=0, vmax=255,
                          extent=(-width / 2, width / 2, -height_real / 2, height_real / 2))
-        self.axes.set_title("Распределение яркости (0-255)")
-        # оси графика - координаты на экране камеры, а не мировые X и Y
-        self.axes.set_xlabel("u (вправо по экрану), мм")
-        self.axes.set_ylabel("v (вверх по экрану), мм")
+        self.axes.set_axis_off()
         self.draw_world_axes(camera)
         self.canvas.draw()
 
     def draw_world_axes(self, camera: Camera) -> None:
-        """Значок ориентации: проекции мировых осей X, Y, Z на плоскость экрана."""
-        origin = (0.12, 0.12)  # в долях области графика
+        origin = (0.08, 0.08)  # в долях области графика
         arrow_length = 0.08
         world_axes = [("X", Vector(1.0, 0.0, 0.0), "red"),
                       ("Y", Vector(0.0, 1.0, 0.0), "lime"),

@@ -43,9 +43,9 @@ class Vector:
 class LightSource:
     def __init__(self, x: float, y: float, z: float, intensity: float,
                  direction: Vector = Vector(0.0, 0.0, -1.0)):
-        self.position = Vector(x, y, z)  # мм
-        self.intensity = intensity  # I0, Вт/ср, сила излучения вдоль оси (theta = 0)
-        self.direction = direction.normalize()  # ось диаграммы излучения (O), единичный вектор
+        self.position = Vector(x, y, z)  # позиция источника, мм
+        self.intensity = intensity  # сила излучения вдоль оси, Вт/ср
+        self.direction = direction.normalize()  # единичный вектор направления освещения
 
 
 class Camera:
@@ -69,13 +69,10 @@ class Camera:
         self.forward = Vector(math.cos(pitch_rad) * math.sin(yaw_rad),
                               math.cos(pitch_rad) * math.cos(yaw_rad),
                               math.sin(pitch_rad))
-        # "вправо" на экране всегда горизонтально, поэтому базис определен и при pitch = +-90
         self.right = Vector(math.cos(yaw_rad), -math.sin(yaw_rad), 0.0)
-        # "вверх" на экране
         self.up = self.right.cross(self.forward)
 
     def screen_point(self, u: float, v: float) -> Vector:
-        """Точка экрана с экранными координатами (u, v), мм, в мировой системе координат."""
         return (self.position + self.forward * self.screen_distance
                 + self.right * u + self.up * v)
 
@@ -108,7 +105,7 @@ def calculate_luminance(point: Vector,
     """
     luminance = 0.0
 
-    # единичный вектор от точки к наблюдателю (v)
+    # единичный вектор от точки к наблюдателю
     to_viewer = (viewer - point).normalize()
 
     for light in lights:
@@ -208,7 +205,7 @@ def render(width: float,
         points_row: list[Vector | None] = []
 
         for col in range(width_resolution):
-            # центр пикселя в экранных координатах (строка 0 - верх изображения)
+            # центр пикселя в экранных координатах
             pixel_u = -width / 2 + (col + 0.5) * pixel_size
             pixel_v = height_real / 2 - (row + 0.5) * pixel_size
             pixel = camera.screen_point(pixel_u, pixel_v)
@@ -233,7 +230,7 @@ def render(width: float,
 
 
 def to_image(luminance: list[list[float]], max_luminance: float) -> list[list[int]]:
-    """Нормировка яркости на максимальное значение в диапазон 0-255."""
+    """Нормировка яркости на максимальное значение в диапазон от 0 до 255."""
     image: list[list[int]] = []
     for luminance_row in luminance:
         image_row: list[int] = []
