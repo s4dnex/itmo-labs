@@ -35,3 +35,6 @@
 [submodule "csa-lab3-m68k"]
 	path = csa/lab3-m68k
 	url = https://github.com/s4dnex/csa-lab3-m68k.git
+[submodule "csa-lab3-risc"]
+	path = csa/lab3-risc
+	url = https://github.com/s4dnex/csa-lab3-risc-iv.git
