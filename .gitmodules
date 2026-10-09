@@ -29,3 +29,6 @@
 [submodule "csa-lab3-acc32"]
 	path = csa/lab3-acc32
 	url = https://github.com/s4dnex/csa-lab3-acc32.git
+[submodule "csa-lab3-f32a"]
+	path = csa/lab3-f32a
+	url = https://github.com/s4dnex/csa-lab3-f32a.git
