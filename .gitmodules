@@ -26,3 +26,6 @@
 [submodule "web-lab4-back"]
 	path = web/lab4-back
 	url = https://github.com/s4dnex/web-lab4-back
+[submodule "csa-lab3-acc32"]
+	path = csa/lab3-acc32
+	url = https://github.com/s4dnex/csa-lab3-acc32.git
