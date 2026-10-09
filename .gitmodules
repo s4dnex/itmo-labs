@@ -1,20 +1,20 @@
-[submodule "programming/lab6"]
+[submodule "programming-lab6"]
 	path = programming/lab6
 	url = https://github.com/s4dnex/prog-lab6.git
-[submodule "programming/lab7"]
+[submodule "programming-lab7"]
 	path = programming/lab7
 	url = https://github.com/s4dnex/prog-lab7.git
-[submodule "opd/lab6-dop"]
+[submodule "opd-lab6-dop"]
 	path = opd/lab6/dop
 	url = https://github.com/safarislava/Snake-RPI4.git
 	branch = interrupt-v2
-[submodule "web/lab1"]
+[submodule "web-lab1"]
 	path = web/lab1
 	url = https://github.com/s4dnex/web-lab1.git
-[submodule "web/lab2"]
+[submodule "web-lab2"]
 	path = web/lab2
 	url = https://github.com/s4dnex/web-lab2.git
-[submodule "langs/lab1"]
+[submodule "langs-lab1"]
 	path = langs/lab1
 	url = https://gitlab.se.ifmo.ru/sadnex/langs-lab1.git
 [submodule "web-lab3"]
